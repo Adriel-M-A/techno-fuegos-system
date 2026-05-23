@@ -96,10 +96,10 @@ El sistema utiliza **modo claro únicamente**. No existe modo oscuro.
   --font-mono: monospace;
 
   /* Radios */
-  --radius-sm: 0.125rem;
-  --radius-DEFAULT: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
+  --radius-sm: 0px;
+  --radius-DEFAULT: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
 
   /* Spacing base */
   --spacing-unit: 4px;
@@ -150,11 +150,9 @@ Fuente principal: **Inter** — elegida por su legibilidad excepcional en interf
 ## 7. Reglas Estrictas de Componentes
 
 ### Bordes y radios
-- Radio base: `4px` (`rounded`)
-- Cards y contenedores grandes: `8px` (`rounded-lg`)
-- Botones e inputs: estrictamente `4px`
-- Círculos: reservados exclusivamente para indicadores de estado (estilo LED) y checkboxes
-- **Prohibido:** `rounded-full` en cualquier elemento que no sea indicador de estado
+- Radio de borde: estrictamente `0px` en todos los componentes.
+- Cards, contenedores, botones, selectores, inputs y badges: deben tener esquinas totalmente rectas y rectilíneas.
+- **Prohibido:** El uso de bordes redondeados (`rounded`, `rounded-sm`, `rounded-lg`, etc.) o formas circulares. Todos los indicadores visuales (como indicadores LED de estado) deben ser de forma cuadrada o rectangular con esquinas de 90 grados.
 
 ### Botones
 - **Primario:** fondo `#b34700`, texto `#ffffff`, radio `4px`, sin gradientes
@@ -234,7 +232,7 @@ Props: `label`, `placeholder`, `value`, `onChange`, `error`, `disabled`, `type`
 
 ### Card
 Props: `title`, `headerActions`, `children`
-- Borde `1px outline-variant`, radio `8px` (`rounded-lg`) — única excepción permitida
+- Borde `1px outline-variant`, radio `0px` (esquinas rectas)
 - Header: fondo `surface-container-low` (`#f3f3f3`), borde inferior, título en `label-lg` uppercase
 - Body: fondo blanco, padding `16px`
 

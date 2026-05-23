@@ -12,10 +12,10 @@ const NAV_ITEMS = [
 // Componente Sidebar principal rediseñado bajo la estética Modern Industrial
 export default function Sidebar() {
   return (
-    <aside className="w-60 h-screen flex flex-col px-2 bg-surface-container-low border-r border-[#e0e0e0] shrink-0">
+    <aside className="w-60 h-screen flex flex-col px-2 bg-surface-container-low border-r border-outline-variant shrink-0">
 
       {/* Cabecera del panel (alineada a px-6 para coincidir exactamente con el pl-6 de los botones) */}
-      <div className="px-6 pt-7 pb-5 border-b border-[#e0e0e0]">
+      <div className="px-6 pt-7 pb-5 border-b border-outline-variant">
         <h1 className="text-lg font-bold text-primary leading-tight">
           Techno Fuegos
         </h1>
@@ -32,7 +32,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Pie de página con versión (alineado a px-6 para conservar la consistencia vertical) */}
-      <div className="px-6 py-4 border-t border-[#e0e0e0]">
+      <div className="px-6 py-4 border-t border-outline-variant">
         <p className="text-[11px] text-on-surface-variant text-center">
           Versión {__APP_VERSION__}
         </p>

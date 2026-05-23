@@ -42,7 +42,7 @@ export default function Input({
           disabled:opacity-50 disabled:cursor-not-allowed
           ${error
             ? 'border-error focus:border-error'
-            : 'border-outline-variant focus:border-primary-container'
+            : 'border-border-iron focus:border-primary-container'
           }
         `}
       />

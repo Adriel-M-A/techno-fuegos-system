@@ -35,9 +35,9 @@ export default function StatusBadge({ status }) {
       className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm label-md uppercase tracking-wide"
       style={{ color: config.color, backgroundColor: config.bg }}
     >
-      {/* Indicador circular tipo LED */}
+      {/* Indicador cuadrado tipo LED */}
       <span
-        className="w-1.5 h-1.5 rounded-full shrink-0"
+        className="w-1.5 h-1.5 shrink-0"
         style={{ backgroundColor: config.dot }}
       />
       {config.label}
