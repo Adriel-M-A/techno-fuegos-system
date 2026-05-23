@@ -56,6 +56,9 @@ Las siguientes habilidades están instaladas en .agents/skills/ y deben aplicars
 - **git-commit** — Estructura uniforme para commits de Git.
 - **tauri-sqlite-bridge** — Control estricto de comandos IPC, queries locales a SQLite y control de estado/navegación vía Zustand sin ruteadores basados en URLs web.
 - **tailwind-v4-rules** — Restricción absoluta sobre archivos de configuración v3 y uso obligatorio de la directiva @theme en src/index.css empleando las variables industriales del tema.
+- **caveman** — Comunicación ultra-comprimida estilo cavernícola para reducir drásticamente el uso de tokens. Activable por petición directa o comando.
+
+> **Regla Mandatoria para IAs (Reporte de Skills):** En cada respuesta donde se realice análisis, planificación o implementación de código, la IA **debe** avisar de manera explícita cuáles de estas skills de la carpeta `.agents` consultó o aplicó para resolver la tarea.
 
 ## 6. Documentación Obligatoria
 

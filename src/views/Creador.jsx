@@ -150,19 +150,19 @@ export default function Creador() {
         
         {/* Resumen de totales a la izquierda */}
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-start">
             <span className="label-md text-on-surface-variant uppercase">Subtotal Ítems</span>
             <span className="mono-data text-on-surface font-bold">{formatARS(subtotalItems)}</span>
           </div>
-          <Divider orientation="vertical" className="h-6" />
-          <div className="flex items-center gap-2">
+          <Divider orientation="vertical" className="h-10" />
+          <div className="flex flex-col items-start">
             <span className="label-md text-on-surface-variant uppercase">Modificadores</span>
             <span className="mono-data text-on-surface font-bold">{formatARS(0)}</span>
           </div>
-          <Divider orientation="vertical" className="h-6" />
-          <div className="flex items-center gap-2">
+          <Divider orientation="vertical" className="h-10" />
+          <div className="flex flex-col items-start">
             <span className="label-md text-on-surface uppercase">Total</span>
-            <span className="text-lg font-bold mono-data text-primary">{formatARS(total)}</span>
+            <span className="text-lg font-bold mono-data text-primary leading-tight">{formatARS(total)}</span>
           </div>
         </div>
 
