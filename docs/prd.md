@@ -9,37 +9,39 @@
 El sistema se enfocará en la creación, cálculo parametrizado, persistencia local y exportación de presupuestos. Incluye gestión de modelos/plantillas para acelerar la carga de configuraciones frecuentes, parametrización dinámica de datos de la empresa, control de empleados (vendedores), y un manual estático offline integrado. Queda fuera de este alcance la facturación fiscal y el control físico de stock.
 
 ## 3. Mapa de Vistas, Subvistas y Navegación (Sidebar + Zustand)
-
 El sistema se compone de un Layout con un `sidebar` izquierdo permanente y un panel derecho dinámico regido por el store de Zustand.
 
 ### Vista 1: Panel de Presupuestos (Dashboard)
 - **Propósito:** Pantalla de inicio para el control y seguimiento comercial rápido.
 - **Métricas Rápidas:** Tarjetas superiores compactas que muestran la facturación total mensual de presupuestos 'Aceptados', cantidad de cotizaciones pendientes en estado 'Enviado' y alertas de documentos 'Vencidos'.
-- **Barra de Herramientas:** Input de búsqueda en tiempo real por nombre de cliente y filtro desplegable por estados ('Borrador', 'Enviado', 'Aceptado', 'Vencido').
-- **Tabla de Datos:** Historial detallado con Fecha de Emisión, Cliente, Total, Vendedor y Estado (con etiquetas visuales de color según el estado).
+- **Barra de Herramientas:** Input de búsqueda en tiempo real por nombre de cliente y filtro desplegable por estados.
+- **Tabla de Datos:** Historial detallado con Fecha de Emisión, Cliente, Total, Vendedor y Estado (con etiquetas visuales sólidas y planas de color).
 - **Acciones Directas:** Iconos de control para visualizar detalles, editar borradores o volver a descargar el PDF.
 
 ### Vista 2: Creador de Presupuestos (Formulario de Cotización)
 - **Propósito:** Núcleo operativo del sistema para la carga ágil y cálculo en tiempo real.
 - **Carga de Plantilla:** Selector dinámico en la cabecera para buscar y seleccionar "Modelos de Presupuesto" previamente guardados, autopopulando el formulario de manera inmediata.
-- **Sección A (Cliente):** Inputs controlados mediante React Hook Form para Nombre, Teléfono, Email y Localidad (crítico para flete).
-- **Sección B (Ítems):** Selector de productos base provistos por el taller con sus respectivas cantidades.
-- **Sección C (Personalización y Modificadores):** Campos específicos para añadir Kg extras de hierro, horas estimadas de soldadura extra para diseños a medida o herrajes especiales.
-- **Sección D (Control Interno):** Selector desplegable de empleados activos y área de observaciones libres para el PDF.
-- **Pie de Formulario (Totales y Acciones):** Visualización del precio final recalculado instantáneamente. Botón "Guardar como Plantilla" (congela la configuración de ítems sin datos de cliente), botón "Guardar Borrador" (persiste en la base de datos) y botón "Exportar PDF".
+- **Sección A (Cliente):** Inputs controlados mediante React Hook Form para Nombre, Teléfono, Email y Localidad.
+- **Sección B (Descripción General e Ítems):** - Input de texto simple para la **Descripción General** del presupuesto (propósito global de la cotización).
+  - Tabla dinámica interactiva de materiales y mano de obra que inyecta filas del catálogo base con cantidad, unidad e importes calculados al instante.
+- **Sección C (Personalización y Modificadores):** Campos específicos para añadir Kg extras de hierro o modificadores complejos a medida.
+- **Sección D (Control Interno):** Selector desplegable de empleados activos y área de observaciones libres.
+- **Pie de Formulario (Totales y Acciones):** Visualización del subtotal y precio final recalculado con `formatARS`. Botón "Guardar como Plantilla", "Guardar Borrador" y "Exportar PDF".
 
 ### Vista 3: Panel de Configuración y Producción
 - **Propósito:** Cerebro lógico e informativo del sistema administrado mediante pestañas (`Tabs`) superiores.
-- **Subvista A (Gestión de Insumos y Recetas):** - Tabla de administración del costo unitario de materiales base (Kg de chapa, hierro, valor hora de mano de obra).
-  - ABM de productos estándar definiendo su receta por defecto (ej: un Fogonero de 80cm consume 40kg de hierro y 6 horas de soldador).
-- **Subvista B (Datos de la Empresa y PDF):** - Formulario de edición para Datos Base de la empresa: Teléfono, Dirección física en Pilar, Correo, Instagram y Web.
-  - Configuración de parámetros globales: Campo numérico de días de validez por defecto (para automatizar fechas de vencimiento) y campos de texto largo para la Cláusula de Seña y Cláusula de Inflación.
-- **Subvista C (Control de Empleados - CRUD):**
-  - Interfaz simple para dar de alta nuevos administrativos/vendedores y un control de estado de actividad ('Activo' / 'Inactivo') para remover personal del creador de presupuestos sin corromper los registros históricos de la base de datos.
+- **Subvista A (Gestión de Insumos y Recetas):** Tabla interactiva editable en caliente (`InsumosTable.jsx`) para administrar materiales (nombre, unidad de medida, costo unitario) y recetas base.
+- **Subvista B (Datos de la Empresa y PDF):** Formulario de edición para datos base de la empresa (Teléfono, Dirección, Correo, Redes), días de validez del presupuesto y las cláusulas condicionales de Seña e Inflación.
+- **Subvista C (Control de Empleados - CRUD):** Interfaz para dar de alta nuevos vendedores y controlar su estado de actividad ('Activo' / 'Inactivo').
+- **Subvista D (Soporte y Mantenimiento - Seguridad):** Implementación de mecanismos de migración de base de datos bit a bit mediante Tauri IPC:
+  - **Botón "Exportar Copia de Seguridad":** Abre el diálogo nativo de Windows para guardar archivos y realiza una copia de seguridad bit a bit del archivo `.db` activo desde `%APPDATA%/techno-fuegos-system/techno-fuegos.db` hacia una unidad externa (ej. pendrive).
+  - **Botón "Importar Copia de Seguridad":** Abre el selector de archivos nativo del sistema, recibe una base de datos externa, valida su estructura estructural y reemplaza el archivo local en `%APPDATA%`, forzando un reinicio limpio del estado de datos del frontend.
 
 ### Vista 4: Manual de Ayuda (Documentación Embebida)
-- **Propósito:** Soporte local offline. Lee el archivo `src/manual/manual-usuario.md` y lo renderiza mediante React Markdown con estilos limpios de lectura.
+- **Propósito:** Soporte local offline. Lee el archivo `src/manual/manual.md` y lo renderiza mediante React Markdown para asistencia rápida del usuario.
+- **Navegación:** Opción permanente al `sidebar` con el icono de Lucide `LifeBuoy` y regido por Zustand.
 
 ## 4. Reglas de Negocio Estrictas
-- **Campos Opcionales en el PDF:** Si un campo informativo de la empresa (ej: Instagram) o una cláusula legal se deja vacía en la Vista 3, la lógica condicional del frontend omitirá la etiqueta y reajustará el espacio vertical en el PDF, evitando líneas en blanco.
-- **Automatización de Fechas:** El formulario creador toma la fecha del sistema y le suma dinámicamente los días de validez configurados para establecer el vencimiento automático del presupuesto.
+- **Campos Opcionales en el PDF:** Si un campo informativo de la empresa o cláusula legal se deja vacía en la Vista 3, la lógica del frontend omitirá la etiqueta y reajustará el espacio vertical en el PDF, evitando líneas en blanco.
+- **Automatización de Fechas:** El creador toma la fecha del sistema y le suma dinámicamente los días de validez configurados para establecer el vencimiento automático del presupuesto.
+- **Formato del PDF Monocromático de Materiales:** El presupuesto exportado se diseña estrictamente en blanco y negro (estética monocromática clásica) para optimizar la impresión en taller y ahorrar tinta. Realiza un desglose técnico de materiales crudos (kilos de chapa, metros de perfiles, insumos específicos) y horas de mano de obra en taller, en lugar de nombres de productos de catálogo de descripciones largas. Incluye físicamente el bloque de la "Descripción General" en la cabecera.

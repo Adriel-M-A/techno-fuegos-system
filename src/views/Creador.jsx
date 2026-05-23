@@ -20,7 +20,7 @@ export default function Creador() {
   const handleProductChange = (rowId, newProductId) => {
     const producto = CATALOGO_PRODUCTOS.find(p => p.id === newProductId);
     const precio = producto ? producto.precio : 0;
-    setProductRows(prev => prev.map(row => 
+    setProductRows(prev => prev.map(row =>
       row.id === rowId ? { ...row, productId: newProductId, unitPrice: precio } : row
     ));
   };
@@ -28,7 +28,7 @@ export default function Creador() {
   const handleQuantityChange = (rowId, newQuantityStr) => {
     let parsed = parseInt(newQuantityStr, 10);
     if (isNaN(parsed) || parsed < 1) parsed = 1;
-    setProductRows(prev => prev.map(row => 
+    setProductRows(prev => prev.map(row =>
       row.id === rowId ? { ...row, quantity: parsed } : row
     ));
   };
@@ -77,7 +77,7 @@ export default function Creador() {
       <div className="flex flex-col gap-6">
 
         {/* Sección A — Datos del cliente en una sola fila */}
-        <Card title="A — Datos del Cliente">
+        <Card title="Datos del Cliente">
           <div className="grid grid-cols-4 gap-4">
             <Input label="Nombre" placeholder="Nombre del cliente" />
             <Input label="Teléfono" placeholder="+54 911 0000 0000" type="tel" />
@@ -87,16 +87,21 @@ export default function Creador() {
         </Card>
 
         {/* Sección B — Selección de Productos y Servicios */}
-        <Card 
-          title="B — Selección de Productos y Servicios"
+        <Card
+          title="Selección de Productos y Servicios"
           headerActions={
-            <Button variant="ghost" size="sm" onClick={handleAddProductRow}>
-              <Plus size={15} />
-              Añadir fila
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleAddProductRow}
+              className="flex items-center gap-1.5 cursor-pointer"
+            >
+              <Plus size={16} />
+              Añadir Fila
             </Button>
           }
         >
-          <ProductsTable 
+          <ProductsTable
             rows={productRows}
             onProductChange={handleProductChange}
             onQuantityChange={handleQuantityChange}
@@ -105,7 +110,7 @@ export default function Creador() {
         </Card>
 
         {/* Sección C — Personalización y Modificaciones */}
-        <Card title="C — Personalización y Modificaciones">
+        <Card title="Personalización y Modificaciones">
           <div className="grid grid-cols-3 gap-4">
             <Input label="Kg extras de hierro" placeholder="0" type="number" />
             <Input label="Horas soldadura extra" placeholder="0" type="number" />
@@ -114,7 +119,7 @@ export default function Creador() {
         </Card>
 
         {/* Sección D — Control y Logística */}
-        <Card title="D — Control y Logística">
+        <Card title="Control y Logística">
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
               <label className="label-md text-on-surface-variant uppercase tracking-wide">
@@ -147,7 +152,7 @@ export default function Creador() {
 
       {/* Barra de Totales y Acciones Inferior en una sola fila */}
       <div className="flex items-center justify-between gap-6 bg-surface-container-low border border-border-iron p-4">
-        
+
         {/* Resumen de totales a la izquierda */}
         <div className="flex items-center gap-6">
           <div className="flex flex-col items-start">
