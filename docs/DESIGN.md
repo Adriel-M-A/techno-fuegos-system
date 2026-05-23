@@ -263,3 +263,36 @@ Props: `columns` (Array: `{key, label, mono?, align?}`), `rows`, `emptyMessage`
 Props: `orientation` (`horizontal`|`vertical`), `className`
 - `1px solid outline-variant` en todos los casos
 - Vertical: `w-px self-stretch` (para uso entre columnas de datos adyacentes)
+
+---
+
+## 11. Utilidades Globales
+
+Para mantener un estándar visual y numérico en toda la aplicación, existen formateadores divididos por tipo de dato:
+
+### Formateo de Moneda (ARS)
+Todos los valores monetarios deben ser renderizados utilizando la utilidad `formatARS`:
+
+```javascript
+import { formatARS } from '../utils/currencyFormatters'
+
+// Uso correcto:
+<span>{formatARS(150000)}</span> // Renderiza: $ 150.000,00 (dependiendo de la configuración local)
+```
+- **Prohibido:** Concatenar manualmente el signo `$` o usar `.toFixed(2)` directamente en las vistas para precios.
+
+### Formateadores de Texto
+Dado que los datos de la base de datos se guardan en minúsculas, se deben usar estos formateadores para renderizar texto:
+
+```javascript
+import { capitalizeFirst, capitalizeWords, capitalizeTitle } from '../utils/textFormatters'
+
+// Capitaliza la primera letra:
+capitalizeFirst('adriel') // "Adriel"
+
+// Capitaliza todas las palabras (nombres propios):
+capitalizeWords('adriel montes') // "Adriel Montes"
+
+// Capitaliza estilo título, ignorando conectores (para ítems):
+capitalizeTitle('reja de seguridad estandar') // "Reja de Seguridad Estandar"
+```

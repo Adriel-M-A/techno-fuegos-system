@@ -1,8 +1,45 @@
-import { Save, FileDown } from 'lucide-react'
+import { useState } from 'react'
+import { Save, FileDown, Plus } from 'lucide-react'
 import { Button, Card, PageHeader, Input, Divider } from '../components/ui'
+import ProductsTable, { CATALOGO_PRODUCTOS } from '../components/ProductsTable'
+import { formatARS } from '../utils/currencyFormatters'
 
 // Vista del creador de presupuestos con secciones estructuradas y barra inferior unificada
 export default function Creador() {
+  const [productRows, setProductRows] = useState([
+    { id: crypto.randomUUID(), productId: '', quantity: 1, unitPrice: 0 }
+  ]);
+
+  const handleAddProductRow = () => {
+    setProductRows(prev => [
+      ...prev,
+      { id: crypto.randomUUID(), productId: '', quantity: 1, unitPrice: 0 }
+    ]);
+  };
+
+  const handleProductChange = (rowId, newProductId) => {
+    const producto = CATALOGO_PRODUCTOS.find(p => p.id === newProductId);
+    const precio = producto ? producto.precio : 0;
+    setProductRows(prev => prev.map(row => 
+      row.id === rowId ? { ...row, productId: newProductId, unitPrice: precio } : row
+    ));
+  };
+
+  const handleQuantityChange = (rowId, newQuantityStr) => {
+    let parsed = parseInt(newQuantityStr, 10);
+    if (isNaN(parsed) || parsed < 1) parsed = 1;
+    setProductRows(prev => prev.map(row => 
+      row.id === rowId ? { ...row, quantity: parsed } : row
+    ));
+  };
+
+  const handleDeleteProductRow = (rowId) => {
+    setProductRows(prev => prev.filter(row => row.id !== rowId));
+  };
+
+  const subtotalItems = productRows.reduce((sum, row) => sum + (row.unitPrice * row.quantity), 0);
+  const total = subtotalItems; // Por ahora sin modificadores
+
   return (
     <div className="p-6 flex flex-col gap-6">
 
@@ -50,10 +87,21 @@ export default function Creador() {
         </Card>
 
         {/* Sección B — Selección de Productos y Servicios */}
-        <Card title="B — Selección de Productos y Servicios">
-          <p className="body-md text-on-surface-variant">
-            Los ítems configurables se implementarán en la próxima iteración.
-          </p>
+        <Card 
+          title="B — Selección de Productos y Servicios"
+          headerActions={
+            <Button variant="ghost" size="sm" onClick={handleAddProductRow}>
+              <Plus size={15} />
+              Añadir fila
+            </Button>
+          }
+        >
+          <ProductsTable 
+            rows={productRows}
+            onProductChange={handleProductChange}
+            onQuantityChange={handleQuantityChange}
+            onDeleteRow={handleDeleteProductRow}
+          />
         </Card>
 
         {/* Sección C — Personalización y Modificaciones */}
@@ -104,17 +152,17 @@ export default function Creador() {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
             <span className="label-md text-on-surface-variant uppercase">Subtotal Ítems</span>
-            <span className="mono-data text-on-surface font-bold">$ 0,00</span>
+            <span className="mono-data text-on-surface font-bold">{formatARS(subtotalItems)}</span>
           </div>
           <Divider orientation="vertical" className="h-6" />
           <div className="flex items-center gap-2">
             <span className="label-md text-on-surface-variant uppercase">Modificadores</span>
-            <span className="mono-data text-on-surface font-bold">$ 0,00</span>
+            <span className="mono-data text-on-surface font-bold">{formatARS(0)}</span>
           </div>
           <Divider orientation="vertical" className="h-6" />
           <div className="flex items-center gap-2">
             <span className="label-md text-on-surface uppercase">Total</span>
-            <span className="text-lg font-bold mono-data text-primary">$ 0,00</span>
+            <span className="text-lg font-bold mono-data text-primary">{formatARS(total)}</span>
           </div>
         </div>
 
