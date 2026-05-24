@@ -1,6 +1,6 @@
 import Sidebar from './components/Sidebar'
 import useNavigationStore from './stores/navigationStore'
-import Presupuestos from './views/Presupuestos'
+import Dashboard from './views/Dashboard'
 import Creador from './views/Creador'
 import ConfiguracionCostos from './views/ConfiguracionCostos'
 import Manual from './views/Manual'
@@ -16,7 +16,7 @@ export default function App() {
 
       {/* Área de contenido principal dinámico — cada vista maneja su propio padding */}
       <main className="flex-1 overflow-y-auto min-w-0 bg-background">
-        {vistaActiva === 'presupuestos' && <Presupuestos />}
+        {vistaActiva === 'presupuestos' && <Dashboard />}
         {vistaActiva === 'creador' && <Creador />}
         {vistaActiva === 'costos' && <ConfiguracionCostos />}
         {vistaActiva === 'manual' && <Manual />}

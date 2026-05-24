@@ -5,7 +5,7 @@ export default function Card({ title, headerActions, children, className = '' })
 
       {/* Header de la card: fondo gris claro con borde inferior */}
       {title && (
-        <div className="flex items-center justify-between px-4 py-3 bg-surface-container-low border-b border-border-iron">
+        <div className="flex items-center justify-between px-4 py-3 bg-surface-container border-b border-border-iron">
           <span className="label-lg text-on-surface uppercase tracking-wide">
             {title}
           </span>

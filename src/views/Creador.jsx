@@ -43,38 +43,45 @@ export default function Creador() {
   return (
     <div className="p-6 flex flex-col gap-4">
 
-      {/* Cabecera de la vista sin acciones secundarias superiores */}
+      {/* Cabecera de la vista con zona de acciones superiores integradas */}
       <PageHeader
         title="Creador de Presupuestos"
         subtitle="Completá los datos del cliente y los ítems del trabajo"
-      />
+      >
+        <div className="flex items-center gap-4">
+          {/* Selección de Plantilla */}
+          <div className="flex items-center gap-2">
+            <span className="label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider select-none shrink-0">
+              Plantilla:
+            </span>
+            <select
+              className="px-3 py-1.5 bg-surface-container border border-border-iron text-sm font-semibold text-on-surface rounded-none focus:outline-none focus:border-primary-container cursor-pointer min-w-[180px]"
+              defaultValue=""
+            >
+              <option value="">Sin plantilla</option>
+              <option value="reja-estandar">Presupuesto Rejas Estándar</option>
+              <option value="porton-herreria">Presupuesto Portón Herrería</option>
+              <option value="baranda-seguridad">Presupuesto Baranda Seguridad</option>
+            </select>
+          </div>
 
-      {/* Fila inicial: Información de Plantilla e ID de presupuesto (sin encabezado de Card) */}
-      <div className="grid grid-cols-2 gap-4 bg-surface-container-low border border-border-iron p-4">
-        <div className="flex flex-col gap-1">
-          <label className="label-md text-on-surface-variant uppercase tracking-wide">
-            Seleccionar Plantilla
-          </label>
-          <select
-            className="w-full px-3 py-2 text-sm text-on-surface bg-surface-container-lowest border border-border-iron rounded focus:outline-none focus:border-primary-container cursor-pointer"
-            defaultValue=""
-          >
-            <option value="">Sin plantilla</option>
-            <option value="reja-estandar">Presupuesto Rejas Estándar</option>
-            <option value="porton-herreria">Presupuesto Portón Herrería</option>
-            <option value="baranda-seguridad">Presupuesto Baranda Seguridad</option>
-          </select>
+          {/* Separador vertical de cabecera */}
+          <div className="h-6 w-px bg-outline-variant" />
+
+          {/* ID de Presupuesto */}
+          <div className="flex items-center gap-2">
+            <span className="label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider select-none shrink-0">
+              ID:
+            </span>
+            <span className="px-3 py-1.5 bg-surface-container-low border border-border-iron text-sm font-mono font-bold text-on-surface select-all rounded-none select-none">
+              PRE-2026-0001
+            </span>
+          </div>
         </div>
-        <Input
-          label="ID de Presupuesto"
-          value="PRE-2026-0001"
-          disabled={true}
-          className="w-full"
-        />
-      </div>
+      </PageHeader>
 
       {/* Flujo vertical de secciones principales de ancho completo */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
 
         {/* Sección A — Datos del cliente en una sola fila */}
         <Card title="Datos del Cliente">
@@ -101,12 +108,19 @@ export default function Creador() {
             </Button>
           }
         >
-          <ProductsTable
-            rows={productRows}
-            onProductChange={handleProductChange}
-            onQuantityChange={handleQuantityChange}
-            onDeleteRow={handleDeleteProductRow}
-          />
+          <div className="flex flex-col gap-4">
+            <Input
+              label="Descripción General"
+              placeholder="Ej: Fabricación e instalación de portón levadizo reforzado y rejas frontales..."
+              className="w-full"
+            />
+            <ProductsTable
+              rows={productRows}
+              onProductChange={handleProductChange}
+              onQuantityChange={handleQuantityChange}
+              onDeleteRow={handleDeleteProductRow}
+            />
+          </div>
         </Card>
 
         {/* Sección C — Personalización y Modificaciones */}
