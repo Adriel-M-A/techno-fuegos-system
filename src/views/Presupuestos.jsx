@@ -4,19 +4,19 @@ import { Button, Card, PageHeader, StatusBadge, DataTable } from '../components/
 // Datos mock de demostración para visualizar el panel de presupuestos
 const PRESUPUESTOS_MOCK = [
   { id: 1, fecha: '22/05/2026', cliente: 'Carlos Rodríguez', total: '$ 148.000', vendedor: 'Adriel', status: 'aceptado' },
-  { id: 2, fecha: '20/05/2026', cliente: 'Florencia Méndez',  total: '$ 92.500',  vendedor: 'Adriel', status: 'enviado'   },
-  { id: 3, fecha: '18/05/2026', cliente: 'Obra Pilar Centro', total: '$ 310.000', vendedor: 'Adriel', status: 'borrador'  },
-  { id: 4, fecha: '10/05/2026', cliente: 'Juan Pérez',        total: '$ 67.200',  vendedor: 'Adriel', status: 'vencido'   },
-  { id: 5, fecha: '08/05/2026', cliente: 'Hormigones SA',     total: '$ 215.800', vendedor: 'Adriel', status: 'aceptado'  },
+  { id: 2, fecha: '20/05/2026', cliente: 'Florencia Méndez', total: '$ 92.500', vendedor: 'Adriel', status: 'enviado' },
+  { id: 3, fecha: '18/05/2026', cliente: 'Obra Pilar Centro', total: '$ 310.000', vendedor: 'Adriel', status: 'borrador' },
+  { id: 4, fecha: '10/05/2026', cliente: 'Juan Pérez', total: '$ 67.200', vendedor: 'Adriel', status: 'vencido' },
+  { id: 5, fecha: '08/05/2026', cliente: 'Hormigones SA', total: '$ 215.800', vendedor: 'Adriel', status: 'aceptado' },
 ]
 
 // Columnas de la tabla de presupuestos
 const COLUMNS = [
-  { key: 'fecha',    label: 'Fecha'      },
-  { key: 'cliente',  label: 'Cliente'    },
-  { key: 'total',    label: 'Total',     mono: true, align: 'right' },
-  { key: 'vendedor', label: 'Vendedor'   },
-  { key: 'status',   label: 'Estado'     },
+  { key: 'fecha', label: 'Fecha' },
+  { key: 'cliente', label: 'Cliente' },
+  { key: 'total', label: 'Total', mono: true, align: 'right' },
+  { key: 'vendedor', label: 'Vendedor' },
+  { key: 'status', label: 'Estado' },
 ]
 
 // Filas procesadas con el badge de estado
@@ -27,15 +27,15 @@ const rows = PRESUPUESTOS_MOCK.map((p) => ({
 
 // Métricas de resumen para las tarjetas superiores
 const METRICAS = [
-  { label: 'Facturación del Mes',  valor: '$ 363.800', sub: 'Presupuestos aceptados',  color: '#8c3600' },
-  { label: 'Cotizaciones Enviadas', valor: '1',         sub: 'Pendientes de respuesta', color: '#004fa2' },
-  { label: 'Presupuestos Vencidos', valor: '1',         sub: 'Sin renovar',             color: '#ba1a1a' },
+  { label: 'Facturación del Mes', valor: '$ 363.800', sub: 'Presupuestos aceptados', color: '#8c3600' },
+  { label: 'Cotizaciones Enviadas', valor: '1', sub: 'Pendientes de respuesta', color: '#004fa2' },
+  { label: 'Presupuestos Vencidos', valor: '1', sub: 'Sin renovar', color: '#ba1a1a' },
 ]
 
 // Vista del panel principal de presupuestos
 export default function Presupuestos() {
   return (
-    <div className="p-6 flex flex-col gap-6">
+    <div className="p-6 flex flex-col gap-4">
 
       {/* Cabecera de la vista */}
       <PageHeader

@@ -6,3 +6,5 @@ export { default as PageHeader }  from './PageHeader'
 export { default as StatusBadge } from './StatusBadge'
 export { default as DataTable }   from './DataTable'
 export { default as Divider }     from './Divider'
+export { default as TabBar }      from './TabBar'
+

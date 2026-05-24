@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { PageHeader } from '../components/ui'
+import { PageHeader, TabBar } from '../components/ui'
 
 // Cargar el contenido en crudo de los archivos markdown correspondientes
 import mdIntroduccion from '../manual/introduccion.md?raw'
@@ -11,9 +11,9 @@ import mdSoporte from '../manual/soporte.md?raw'
 // Listado de pestañas del manual de ayuda
 const TABS = [
   { id: 'introduccion', label: 'Introducción' },
-  { id: 'creacion',     label: 'Creador de Presupuestos' },
-  { id: 'costos',       label: 'Costos y Materiales' },
-  { id: 'soporte',      label: 'Seguridad y Copias' },
+  { id: 'creacion', label: 'Creador de Presupuestos' },
+  { id: 'costos', label: 'Costos y Materiales' },
+  { id: 'soporte', label: 'Seguridad y Copias' },
 ]
 
 /**
@@ -40,7 +40,7 @@ export default function Manual() {
   }
 
   return (
-    <div className="p-6 flex flex-col gap-6">
+    <div className="p-6 flex flex-col gap-4">
       {/* Encabezado superior estructurado */}
       <PageHeader
         title="Manual de Ayuda"
@@ -48,27 +48,7 @@ export default function Manual() {
       />
 
       {/* Selector de pestañas con estética industrial */}
-      <div className="flex items-center border-b border-outline-variant">
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab.id
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`
-                px-4 py-2.5 label-lg text-sm transition-colors duration-150
-                border-b-2 -mb-px cursor-pointer
-                ${isActive
-                  ? 'border-primary-container text-primary-container font-semibold'
-                  : 'border-transparent text-on-surface-variant hover:text-on-surface'
-                }
-              `}
-            >
-              {tab.label}
-            </button>
-          )
-        })}
-      </div>
+      <TabBar tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
 
       {/* Contenedor del manual con bordes de 0px y sin sombras */}
       <div className="p-6 bg-surface-container-lowest border border-outline-variant rounded-none">

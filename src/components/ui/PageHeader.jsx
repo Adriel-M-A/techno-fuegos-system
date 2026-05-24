@@ -1,7 +1,7 @@
 // Componente PageHeader: cabecera de vista con título, subtítulo y zona de acciones
 export default function PageHeader({ title, subtitle, children }) {
   return (
-    <div className="flex flex-col gap-4 pb-5 mb-6 border-b border-outline-variant">
+    <div className="flex flex-col gap-4 pb-5 mb-3 border-b border-outline-variant">
 
       {/* Fila principal: título + acciones */}
       <div className="flex items-start justify-between gap-4">

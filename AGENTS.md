@@ -28,6 +28,8 @@
 - **Soporte y Mantenimiento (Vista 3 - Pestaña/Tab):** Una pestaña adicional superior en el panel de configuración operativa diario. Ofrece herramientas de seguridad con dos acciones de copia bit a bit (`exportar_db` e `importar_db`) mediante comandos IPC nativos de Tauri actuando sobre el archivo local de `%APPDATA%/techno-fuegos-system/techno-fuegos.db` (forzando reinicio de estado del frontend al importar una nueva base de datos externa).
 - **Descripción General en Creador (Vista 2):** Input de texto simple en la parte superior del formulario (Sección B) para detallar brevemente el propósito de la cotización.
 - **Formato del PDF Monocromático de Materiales:** El reporte PDF en jsPDF se diseña estrictamente en blanco y negro (estética clásica monocromática) para taller. Muestra la "Descripción General" en la cabecera y un desglose técnico riguroso de materiales crudos (kilos de chapa, metros de perfiles, insumos) e insumos de taller junto con las horas de mano de obra estimadas, en lugar de nombres de productos finales de catálogo.
+- **Control de Commits en Git:** La IA tiene estrictamente prohibido realizar commits en Git de forma autónoma. Solo podrá realizar commits cuando el usuario lo solicite o avise explícitamente.
+
 
 ## 4. Estructura del Repositorio
 ```text

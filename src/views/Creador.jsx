@@ -41,7 +41,7 @@ export default function Creador() {
   const total = subtotalItems; // Por ahora sin modificadores
 
   return (
-    <div className="p-6 flex flex-col gap-6">
+    <div className="p-6 flex flex-col gap-4">
 
       {/* Cabecera de la vista sin acciones secundarias superiores */}
       <PageHeader
