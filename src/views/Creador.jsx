@@ -66,14 +66,14 @@ export default function Creador() {
           </div>
 
           {/* Separador vertical de cabecera */}
-          <div className="h-6 w-px bg-outline-variant" />
+          <div className="h-6 w-px bg-outline-variant/60" />
 
           {/* ID de Presupuesto */}
           <div className="flex items-center gap-2">
             <span className="label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider select-none shrink-0">
               ID:
             </span>
-            <span className="px-3 py-1.5 bg-surface-container-low border border-border-iron text-sm font-mono font-bold text-on-surface select-all rounded-none select-none">
+            <span className="px-3 py-1.5 bg-surface-container-low/60 border border-outline-variant/60 text-sm font-mono font-bold text-on-surface select-all rounded-sm select-none">
               PRE-2026-0001
             </span>
           </div>
@@ -150,7 +150,7 @@ export default function Creador() {
                 Observaciones
               </label>
               <textarea
-                className="w-full px-3 py-2 text-sm text-on-surface bg-surface-container-lowest border border-border-iron rounded focus:outline-none focus:border-primary-container resize-none"
+                className="w-full px-3 py-2 text-sm text-on-surface bg-surface-container-lowest border border-outline-variant rounded-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-container/30 focus:border-primary-container resize-none"
                 rows={3}
                 placeholder="Notas internas para el PDF..."
               />
@@ -161,7 +161,7 @@ export default function Creador() {
       </div>
 
       {/* Barra de Totales y Acciones Inferior en una sola fila */}
-      <div className="flex items-center justify-between gap-6 bg-surface-container-low border border-border-iron p-4">
+      <div className="flex items-center justify-between gap-6 bg-surface-container-lowest border border-outline-variant/60 p-4 rounded-md shadow-[var(--shadow-raised)]">
 
         {/* Resumen de totales a la izquierda */}
         <div className="flex items-center gap-6">

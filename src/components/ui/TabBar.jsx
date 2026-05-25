@@ -17,11 +17,11 @@ export default function TabBar({ tabs, activeTab, onChange }) {
             key={tab.id}
             onClick={() => onChange(tab.id)}
             className={`
-              px-4 py-2.5 label-lg text-sm transition-colors duration-150
-              border-b-2 -mb-px cursor-pointer
+              px-4 py-2.5 label-lg text-sm transition-all duration-200
+              border-b-2 -mb-px cursor-pointer rounded-t-sm
               ${isActive
-                ? 'border-primary-container text-primary-container font-semibold'
-                : 'border-transparent text-on-surface-variant hover:text-on-surface'
+                ? 'border-primary-container text-primary-container font-semibold bg-primary-container/[0.04]'
+                : 'border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/40'
               }
             `}
           >

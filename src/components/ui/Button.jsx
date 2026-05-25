@@ -11,8 +11,9 @@ export default function Button({
   // Clases base comunes a todas las variantes
   const base = `
     inline-flex items-center justify-center gap-2 font-medium
-    transition-colors duration-150 cursor-pointer select-none
-    rounded-none focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed
+    transition-all duration-200 cursor-pointer select-none
+    rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-container/40 focus-visible:ring-offset-1
+    disabled:opacity-50 disabled:cursor-not-allowed disabled:-translate-y-0 disabled:shadow-none
   `
 
   // Tamaños disponibles
@@ -25,13 +26,15 @@ export default function Button({
   // Variantes de estilo
   const variants = {
     primary: `
-      bg-primary-container text-on-primary
-      hover:bg-primary active:shadow-[inset_0_0_0_2px_rgba(0,0,0,0.15)]
+      bg-primary-container text-on-primary shadow-sm
+      hover:bg-primary hover:shadow-md hover:-translate-y-[1px]
+      active:translate-y-0 active:shadow-sm
     `,
     secondary: `
       bg-surface-container-lowest text-on-surface
-      border border-outline-variant
-      hover:bg-surface-container active:shadow-[inset_0_0_0_2px_rgba(0,0,0,0.08)]
+      border border-outline-variant shadow-sm
+      hover:bg-surface-container hover:-translate-y-[1px] hover:shadow-md
+      active:translate-y-0 active:shadow-sm
     `,
     ghost: `
       bg-transparent text-primary-container

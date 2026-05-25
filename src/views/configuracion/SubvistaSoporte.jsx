@@ -16,7 +16,7 @@ export default function SubvistaSoporte() {
 
         {/* Banner Informativo Superior */}
         <div
-          className="flex gap-4 p-4 border border-outline-variant rounded-none items-start bg-primary/5"
+          className="flex gap-4 p-4 border border-outline-variant/60 rounded-sm items-start bg-primary-container/8"
         >
           <Info className="text-primary-container shrink-0 mt-0.5" size={18} />
           <p className="body-md text-on-surface-variant leading-relaxed">
@@ -29,9 +29,9 @@ export default function SubvistaSoporte() {
       <div className="grid grid-cols-2 gap-6">
 
         {/* Card Backup Externo */}
-        <div className="border border-outline-variant bg-surface-container-lowest rounded-none flex flex-col">
+        <div className="border border-outline-variant/60 bg-surface-container-lowest rounded-md shadow-[var(--shadow-card)] overflow-hidden flex flex-col">
           {/* Header de Card */}
-          <div className="px-5 py-3 border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+          <div className="px-5 py-3 border-b border-outline-variant/60 flex items-center justify-between bg-surface-container-low/70">
             <span className="label-md text-on-surface-variant tracking-wider font-semibold uppercase">
               Backup Externo
             </span>
@@ -49,7 +49,7 @@ export default function SubvistaSoporte() {
             </div>
 
             {/* Caja de Ruta Técnica */}
-            <div className="bg-surface-container border border-outline-variant p-3 rounded-none flex flex-col gap-1">
+            <div className="bg-surface-container-low/60 border border-outline-variant/60 p-3 rounded-sm flex flex-col gap-1">
               <span className="text-[11px] font-semibold text-on-surface-variant uppercase tracking-wider">
                 Ruta de origen técnica:
               </span>
@@ -67,9 +67,9 @@ export default function SubvistaSoporte() {
         </div>
 
         {/* Card Restauración */}
-        <div className="border border-outline-variant bg-surface-container-lowest rounded-none flex flex-col">
+        <div className="border border-outline-variant/60 bg-surface-container-lowest rounded-md shadow-[var(--shadow-card)] overflow-hidden flex flex-col">
           {/* Header de Card */}
-          <div className="px-5 py-3 border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+          <div className="px-5 py-3 border-b border-outline-variant/60 flex items-center justify-between bg-surface-container-low/70">
             <span className="label-md text-on-surface-variant tracking-wider font-semibold uppercase">
               Restauración de Sistema
             </span>
@@ -88,7 +88,7 @@ export default function SubvistaSoporte() {
 
             {/* Banner de Advertencia */}
             <div
-              className="border border-error bg-error/5 p-3 rounded-none flex gap-3 items-start"
+              className="border border-error/30 bg-error/10 p-3 rounded-sm flex gap-3 items-start"
             >
               <AlertTriangle className="text-error shrink-0 mt-0.5" size={16} />
               <p className="text-[11px] font-bold text-error uppercase leading-tight tracking-wide">
@@ -107,7 +107,7 @@ export default function SubvistaSoporte() {
       </div>
 
       {/* Fila Inferior de Metadatos */}
-      <div className="grid grid-cols-3 gap-6 pt-6 border-t border-outline-variant mt-2">
+      <div className="grid grid-cols-3 gap-6 pt-6 border-t border-outline-variant/60 mt-2">
         {/* Columna 1: Último Backup */}
         <div className="flex items-center gap-3">
           <History className="text-on-surface-variant" size={20} />

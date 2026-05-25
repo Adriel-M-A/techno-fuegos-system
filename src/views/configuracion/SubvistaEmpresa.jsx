@@ -28,7 +28,7 @@ export default function SubvistaEmpresa() {
           <div className="col-span-2 flex flex-col gap-1">
             <label className="label-md text-on-surface-variant uppercase tracking-wide">Cláusula de Seña</label>
             <textarea
-              className="w-full px-3 py-2 text-sm text-on-surface bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-primary-container resize-none"
+              className="w-full px-3 py-2 text-sm text-on-surface bg-surface-container-lowest border border-outline-variant rounded-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-container/30 focus:border-primary-container resize-none"
               rows={3}
               placeholder="Texto que aparecerá en el pie del presupuesto PDF..."
             />
@@ -36,7 +36,7 @@ export default function SubvistaEmpresa() {
           <div className="col-span-2 flex flex-col gap-1">
             <label className="label-md text-on-surface-variant uppercase tracking-wide">Cláusula de Inflación</label>
             <textarea
-              className="w-full px-3 py-2 text-sm text-on-surface bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-primary-container resize-none"
+              className="w-full px-3 py-2 text-sm text-on-surface bg-surface-container-lowest border border-outline-variant rounded-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-container/30 focus:border-primary-container resize-none"
               rows={3}
               placeholder="Texto que aparecerá en el pie del presupuesto PDF..."
             />

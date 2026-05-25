@@ -11,7 +11,7 @@ export default function TablePagination({
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
 
   return (
-    <div className="px-5 py-4 border-t border-outline-variant bg-surface-container-low flex items-center justify-between">
+    <div className="px-5 py-4 border-t border-outline-variant/40 bg-surface-container-low/40 flex items-center justify-between">
       {/* Resumen del conteo actual a la izquierda */}
       <span className="text-xs text-on-surface-variant font-medium select-none">
         Mostrando <span className="font-mono">{showingStart}</span>-
@@ -26,7 +26,7 @@ export default function TablePagination({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-3 py-1.5 text-xs font-semibold text-on-surface bg-surface-container-lowest border border-outline-variant hover:bg-surface-container transition-colors duration-150 cursor-pointer rounded-none select-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-container-lowest"
+          className="px-3 py-1.5 text-xs font-semibold text-on-surface bg-surface-container-lowest border border-outline-variant/60 hover:bg-surface-container hover:shadow-sm transition-all duration-200 cursor-pointer rounded-sm select-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-container-lowest"
         >
           Anterior
         </button>
@@ -39,11 +39,11 @@ export default function TablePagination({
               key={p}
               onClick={() => onPageChange(p)}
               className={`
-                px-3 py-1.5 text-xs font-mono select-none rounded-none cursor-pointer
+                px-3 py-1.5 text-xs font-mono select-none rounded-sm cursor-pointer transition-all duration-200
                 ${
                   isActive
-                    ? 'font-bold text-white bg-primary border border-primary'
-                    : 'font-semibold text-on-surface bg-surface-container-lowest border border-outline-variant hover:bg-surface-container transition-colors duration-150'
+                    ? 'font-bold text-white bg-primary-container border border-primary-container shadow-sm'
+                    : 'font-semibold text-on-surface bg-surface-container-lowest border border-outline-variant/60 hover:bg-surface-container hover:shadow-sm'
                 }
               `}
             >
@@ -56,7 +56,7 @@ export default function TablePagination({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="px-3 py-1.5 text-xs font-semibold text-on-surface bg-surface-container-lowest border border-outline-variant hover:bg-surface-container transition-colors duration-150 cursor-pointer rounded-none select-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-container-lowest"
+          className="px-3 py-1.5 text-xs font-semibold text-on-surface bg-surface-container-lowest border border-outline-variant/60 hover:bg-surface-container hover:shadow-sm transition-all duration-200 cursor-pointer rounded-sm select-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-container-lowest"
         >
           Siguiente
         </button>

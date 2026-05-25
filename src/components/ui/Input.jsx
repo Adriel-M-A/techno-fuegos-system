@@ -36,13 +36,13 @@ export default function Input({
         disabled={disabled}
         className={`
           w-full px-3 py-2 text-sm text-on-surface bg-surface-container-lowest
-          border rounded-none transition-colors duration-150
-          placeholder:text-on-surface-variant/50
+          border transition-all duration-200 rounded-sm
+          placeholder:text-on-surface-variant/40
           focus:outline-none
           disabled:opacity-50 disabled:cursor-not-allowed
           ${error
-            ? 'border-error focus:border-error'
-            : 'border-border-iron focus:border-primary-container'
+            ? 'border-error focus:ring-2 focus:ring-error/20 focus:border-error'
+            : 'border-outline-variant focus:ring-2 focus:ring-primary-container/30 focus:border-primary-container'
           }
         `}
       />

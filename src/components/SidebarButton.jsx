@@ -9,18 +9,17 @@ export default function SidebarButton({ label, icon: Icon, vista }) {
     <button
       onClick={() => setVista(vista)}
       className={`
-        w-full flex items-center gap-3 pl-6 pr-4 py-3 text-sm font-medium
-        transition-colors duration-150 rounded-none cursor-pointer
-        border-r-[3px] border-solid text-left
+        w-full flex items-center gap-3 pl-4 pr-4 py-2.5 text-sm font-medium
+        transition-all duration-200 rounded-md cursor-pointer text-left
         ${isActive
-          ? 'bg-primary/10 border-primary text-primary'
-          : 'border-r-transparent text-on-surface hover:bg-surface-container-high hover:text-on-surface'
+          ? 'bg-[var(--color-sidebar-active)] text-primary-container font-semibold'
+          : 'text-on-surface hover:bg-surface-container-high/60 hover:text-on-surface'
         }
       `}
     >
       <Icon
         size={18}
-        className={isActive ? 'text-primary' : 'text-on-surface-variant'}
+        className={`transition-transform duration-200 ${isActive ? 'text-primary-container scale-105' : 'text-on-surface-variant'}`}
       />
       <span>{label}</span>
     </button>

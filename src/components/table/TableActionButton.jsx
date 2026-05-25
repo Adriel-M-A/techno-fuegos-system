@@ -11,14 +11,14 @@ export default function TableActionButton({
   // Clases base del botón de acción (diseño industrial con esquinas rectas)
   const base = `
     p-1.5 inline-flex items-center justify-center
-    transition-colors duration-150 cursor-pointer select-none rounded-none
+    transition-all duration-200 cursor-pointer select-none rounded-sm
     disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none
   `
 
   // Variantes estéticas del botón de acción
   const variants = {
-    default: 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container',
-    danger: 'text-on-surface-variant hover:text-error hover:bg-error-container/50',
+    default: 'text-on-surface-variant hover:text-primary-container hover:bg-primary-container/8',
+    danger: 'text-on-surface-variant hover:text-error hover:bg-error-container/40',
   }
 
   return (

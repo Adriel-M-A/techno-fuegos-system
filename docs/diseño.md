@@ -9,37 +9,39 @@ El sistema utiliza **modo claro únicamente**. No existe modo oscuro.
 
 ## 2. Paleta de Colores
 
-### Colores principales
+### Colores principales (Windows 11 inspired)
 | Token | Valor hex | Uso |
 | --- | --- | --- |
-| `primary` | `#005bbf` | Acciones primarias, estado activo, marca principal azul |
-| `primary-container` | `#1a73e8` | Botones primarios, CTAs, fondo interactivo |
+| `primary` | `#005bbf` | Azul base corporativo |
+| `primary-container` | `#0078d4` | Botones primarios, CTAs, foco interactivo vibrante |
 | `on-primary` | `#ffffff` | Texto sobre fondos primary |
 | `on-primary-container` | `#ffffff` | Texto sobre primary-container |
-| `secondary` | `#515f74` | Elementos de soporte, texto secundario |
-| `secondary-container` | `#d5e3fc` | Hover en ítems de navegación, fondos secundarios sutiles |
-| `on-secondary-container` | `#57657a` | Texto sobre secondary-container |
-| `tertiary` | `#9e4300` | Acciones secundarias, color óxido industrial |
-| `tertiary-container` | `#c55500` | Botones terciarios, links informativos óxido |
+| `secondary` | `#4a5768` | Elementos de soporte y texto secundario |
+| `secondary-container` | `#d8e6f8` | Fondos interactivos secundarios (hover activo sidebar) |
+| `on-secondary-container` | `#33445c` | Texto sobre fondos secondary-container |
+| `tertiary` | `#d9480f` | Acciones secundarias y acentos vibrantes |
+| `tertiary-container` | `#e8590c` | Botones terciarios y destaques en naranja vibrante |
 | `on-tertiary` | `#ffffff` | Texto sobre fondos tertiary |
-| `error` | `#ba1a1a` | Estados de error |
-| `error-container` | `#ffdad6` | Fondos de mensajes de error |
-| `on-error-container` | `#93000a` | Texto sobre error-container |
+| `error` | `#c42b1c` | Estados de error y alertas de detención (Windows 11 Rojo) |
+| `error-container` | `#fde7e9` | Fondos de mensajes de error |
+| `on-error-container` | `#bc2f32` | Texto sobre fondos de error |
+| `success` | `#107c10` | Estados de confirmación, éxito y activo (Windows 11 Verde) |
 
 ### Colores de superficie
 | Token | Valor hex | Uso |
 | --- | --- | --- |
-| `background` | `#f7f9fb` | Fondo general de la aplicación |
-| `surface` | `#f7f9fb` | Superficie base |
-| `surface-container-lowest` | `#ffffff` | Tarjetas, modales, paneles principales |
-| `surface-container-low` | `#f2f4f6` | Sidebar, cabeceras secundarias |
-| `surface-container` | `#eceef0` | Contenedores secundarios, cajas técnicas |
-| `surface-container-high` | `#e6e8ea` | Contenedores elevados, hovers sutiles |
-| `on-surface` | `#191c1e` | Texto principal |
-| `on-surface-variant` | `#414754` | Texto secundario de soporte |
-| `outline` | `#727785` | Bordes de inputs en foco |
-| `outline-variant` | `#c1c6d6` | Bordes sutiles, divisores |
-| `surface-tint` | `#005bc0` | Tinte de superficie activa |
+| `background` | `#f3f6fb` | Fondo general de la aplicación con tinte azulado Mica |
+| `surface` | `#f3f6fb` | Superficie base |
+| `surface-container-lowest` | `#ffffff` | Tarjetas, modales, paneles principales (blanco puro) |
+| `surface-container-low` | `#f8fafc` | Fondos de cabecera secundaria y bloques sutiles |
+| `surface-container` | `#f1f5f9` | Contenedores secundarios y cajas de datos |
+| `surface-container-high` | `#e2e8f0` | Contenedores elevados y hovers discretos |
+| `surface-container-highest` | `#cbd5e1` | Separadores y divisores principales |
+| `on-surface` | `#1a1a1a` | Texto principal del sistema |
+| `on-surface-variant` | `#475569` | Texto de soporte secundario |
+| `outline` | `#0078d4` | Bordes de foco activo |
+| `outline-variant` | `#cbd5e1` | Bordes sutiles y divisores finos de contenedor |
+| `surface-tint` | `#0078d4` | Tinte de superficie activa |
 
 ---
 
@@ -49,70 +51,64 @@ El sistema utiliza **modo claro únicamente**. No existe modo oscuro.
 @import "tailwindcss";
 
 @theme {
-  /* Primary */
+  /* Primary - Azul Microsoft / Windows 11 */
   --color-primary: #005bbf;
-  --color-primary-container: #1a73e8;
+  --color-primary-container: #0078d4;
   --color-on-primary: #ffffff;
   --color-on-primary-container: #ffffff;
-  --color-inverse-primary: #adc7ff;
-  --color-primary-fixed: #d8e2ff;
-  --color-primary-fixed-dim: #adc7ff;
-  --color-on-primary-fixed: #001a41;
-  --color-on-primary-fixed-variant: #004493;
+  --color-inverse-primary: #80bfff;
+  --color-primary-fixed: #cce3ff;
+  --color-primary-fixed-dim: #80bfff;
+  --color-on-primary-fixed: #001e47;
+  --color-on-primary-fixed-variant: #005bb7;
 
   /* Secondary */
-  --color-secondary: #515f74;
+  --color-secondary: #4a5768;
   --color-on-secondary: #ffffff;
-  --color-secondary-container: #d5e3fc;
-  --color-on-secondary-container: #57657a;
-  --color-secondary-fixed: #d5e3fc;
-  --color-secondary-fixed-dim: #b9c7df;
-  --color-on-secondary-fixed: #0d1c2e;
-  --color-on-secondary-fixed-variant: #3a485b;
+  --color-secondary-container: #d8e6f8;
+  --color-on-secondary-container: #33445c;
 
   /* Tertiary */
-  --color-tertiary: #9e4300;
-  --color-tertiary-container: #c55500;
+  --color-tertiary: #d9480f;
+  --color-tertiary-container: #e8590c;
   --color-on-tertiary: #ffffff;
-  --color-on-tertiary-container: #0e0200;
-  --color-tertiary-fixed: #ffdbcb;
-  --color-tertiary-fixed-dim: #ffb691;
-  --color-on-tertiary-fixed: #341100;
-  --color-on-tertiary-fixed-variant: #783100;
+  --color-on-tertiary-container: #ffffff;
 
   /* Error */
-  --color-error: #ba1a1a;
+  --color-error: #c42b1c;
   --color-on-error: #ffffff;
-  --color-error-container: #ffdad6;
-  --color-on-error-container: #93000a;
+  --color-error-container: #fde7e9;
+  --color-on-error-container: #bc2f32;
+
+  /* Success */
+  --color-success: #107c10;
 
   /* Surface */
-  --color-background: #f7f9fb;
-  --color-surface: #f7f9fb;
+  --color-background: #f3f6fb;
+  --color-surface: #f3f6fb;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f2f4f6;
-  --color-surface-container: #eceef0;
-  --color-surface-container-high: #e6e8ea;
-  --color-surface-container-highest: #e0e3e5;
-  --color-on-surface: #191c1e;
-  --color-on-surface-variant: #414754;
-  --color-outline: #727785;
-  --color-outline-variant: #c1c6d6;
-  --color-border-iron: #c1c6d6;
-  --color-surface-tint: #005bc0;
+  --color-surface-container-low: #f8fafc;
+  --color-surface-container: #f1f5f9;
+  --color-surface-container-high: #e2e8f0;
+  --color-surface-container-highest: #cbd5e1;
+  --color-on-surface: #1a1a1a;
+  --color-on-surface-variant: #475569;
+  --color-outline: #0078d4;
+  --color-outline-variant: #cbd5e1;
+  --color-border-iron: #cbd5e1;
+  --color-surface-tint: #0078d4;
 
-  /* Tipografías */
-  --font-display: "Inter", sans-serif;
-  --font-mono: monospace;
+  /* Radios Fluent */
+  --radius-sm: 4px;      /* Botones, inputs, badges */
+  --radius-DEFAULT: 4px;
+  --radius-md: 8px;      /* Cards, tablas de datos, modales */
+  --radius-lg: 12px;     /* Elementos flotantes o pills */
+  --radius-xl: 16px;
+  --radius-full: 9999px; /* Chips e indicadores redondos */
 
-  /* Radios estrictos rectilíneos */
-  --radius-sm: 0px;
-  --radius-DEFAULT: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-
-  /* Spacing base */
-  --spacing-unit: 4px;
+  /* Sombras Fluent */
+  --shadow-card: 0px 1.6px 3.6px rgba(0,0,0,0.08), 0px 0.3px 0.9px rgba(0,0,0,0.04);
+  --shadow-raised: 0px 8px 16px rgba(0,0,0,0.08), 0px 1px 3px rgba(0,0,0,0.04);
 }
 ```
 
@@ -138,15 +134,16 @@ Fuente principal: **Inter** — elegida por su legibilidad excepcional en interf
 
 ## 5. Reglas Estrictas de Componentes Visuales
 
-### Bordes y radios
+### Bordes y radios (Fluent Design Windows 10/11)
 
-- Radio de borde: estrictamente `0px` en todos los componentes del sistema.
+- **Radios de esquina:** Se implementan de forma estricta en el sistema para suavizar la interfaz:
+  - **`4px` (rounded-sm):** En botones, selectores, campos de texto (inputs) y badges rectangulares.
+  - **`8px` (rounded-md):** En tarjetas (`Cards`), contenedores principales, modales y tablas de datos.
+  - **`rounded-full`:** En badges de estado (`StatusBadge`) para simular pastillas/chips modernos.
     
-- Cards, contenedores, botones, selectores, inputs y badges: deben tener esquinas totalmente rectas y rectilíneas.
+- **Elevación y sombras:** Las tarjetas (`Cards`) y paneles elevados deben implementar sombras sutiles Fluent (`shadow-card` o `shadow-raised`) para dar profundidad a la interfaz y evitar un diseño completamente plano.
     
-- **Prohibido:** El uso de bordes redondeados (`rounded`, `rounded-sm`, etc.) o formas circulares. Todos los indicadores visuales (como los LEDs de estado) serán cuadrados o rectangulares.
-    
-- Todos los inputs, tablas, tarjetas y contenedores deben tener un borde visible fino de `1px` usando `--color-outline-variant`.
+- Todos los inputs, tablas, tarjetas y contenedores deben tener un borde visible fino de `1px` usando `--color-outline-variant` para mantener la separación y estructura visual clara.
     
 
 ### Números, Precios e Importes

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Plus, Send, Eye, Download, Pencil, RotateCcw, Trash2 } from 'lucide-react'
-import { Button, PageHeader, Select } from '../components/ui'
+import { Button, PageHeader, Select, StatusBadge } from '../components/ui'
 import { DataTable, TableActionButton, TablePagination } from '../components/table'
 import { formatARS } from '../utils/currencyFormatters'
 
@@ -54,36 +54,9 @@ export default function Dashboard() {
   const indexFin = Math.min(indexInicio + ITEMS_PER_PAGE, totalItems)
   const presupuestosPaginados = presupuestosFiltrados.slice(indexInicio, indexFin)
 
-  // Renderizar la etiqueta de estado con estética rectangular outline
+  // Renderizar la etiqueta de estado usando el componente centralizado StatusBadge
   const renderEstadoBadge = (status) => {
-    switch (status) {
-      case 'aceptado':
-        return (
-          <span className="border border-success text-success bg-success/5 px-2.5 py-0.5 label-lg text-xs font-bold tracking-wider rounded-none uppercase select-none inline-block">
-            Aceptado
-          </span>
-        )
-      case 'entregado':
-        return (
-          <span className="border border-primary text-primary bg-primary/5 px-2.5 py-0.5 label-lg text-xs font-bold tracking-wider rounded-none uppercase select-none inline-block">
-            Entregado
-          </span>
-        )
-      case 'vencido':
-        return (
-          <span className="border border-tertiary text-tertiary bg-tertiary/5 px-2.5 py-0.5 label-lg text-xs font-bold tracking-wider rounded-none uppercase select-none inline-block">
-            Vencido
-          </span>
-        )
-      case 'borrador':
-        return (
-          <span className="border border-secondary text-secondary bg-secondary/5 px-2.5 py-0.5 label-lg text-xs font-bold tracking-wider rounded-none uppercase select-none inline-block">
-            Borrador
-          </span>
-        )
-      default:
-        return null
-    }
+    return <StatusBadge status={status} />
   }
 
   // Renderizar los botones de acción dinámicos en base al estado del presupuesto
@@ -185,12 +158,12 @@ export default function Dashboard() {
       <div className="grid grid-cols-3 gap-6">
         
         {/* Tarjeta 1: Total Facturado Aceptado */}
-        <div className="bg-surface-container-lowest border border-outline-variant rounded-none px-5 py-4 flex flex-col gap-2">
+        <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-md shadow-[var(--shadow-card)] px-5 py-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="label-lg text-xs text-on-surface-variant font-semibold tracking-wider uppercase">
               Total Facturado Aceptado
             </span>
-            <span className="border border-[#2e7d32]/30 text-[#2e7d32] bg-[#2e7d32]/5 px-1.5 py-0.5 text-xs font-semibold rounded-none select-none">
+            <span className="border border-success/30 text-success bg-success/10 px-1.5 py-0.5 text-xs font-semibold rounded-sm select-none">
               +12%
             </span>
           </div>
@@ -203,12 +176,12 @@ export default function Dashboard() {
         </div>
 
         {/* Tarjeta 2: Presupuestos Entregados */}
-        <div className="bg-surface-container-lowest border border-outline-variant rounded-none px-5 py-4 flex flex-col gap-2">
+        <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-md shadow-[var(--shadow-card)] px-5 py-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="label-lg text-xs text-on-surface-variant font-semibold tracking-wider uppercase">
               Presupuestos Entregados
             </span>
-            <Send className="text-primary" size={16} />
+            <Send className="text-primary-container" size={16} />
           </div>
           <span className="text-3xl font-extrabold text-on-surface font-mono mono-data tracking-tight select-all">
             14
@@ -219,12 +192,12 @@ export default function Dashboard() {
         </div>
 
         {/* Tarjeta 3: Presupuestos Vencidos */}
-        <div className="bg-surface-container-lowest border border-outline-variant rounded-none px-5 py-4 flex flex-col gap-2">
+        <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-md shadow-[var(--shadow-card)] px-5 py-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="label-lg text-xs text-on-surface-variant font-semibold tracking-wider uppercase">
               Presupuestos Vencidos
             </span>
-            <span className="border border-[#ba1a1a]/30 text-[#ba1a1a] bg-[#ba1a1a]/5 px-1.5 py-0.5 text-xs font-semibold rounded-none select-none uppercase">
+            <span className="border border-error/30 text-error bg-error/10 px-1.5 py-0.5 text-xs font-semibold rounded-sm select-none uppercase">
               Crítico
             </span>
           </div>
@@ -239,7 +212,7 @@ export default function Dashboard() {
       </div>
 
       {/* Barra de Búsqueda y Filtros Simplificada */}
-      <div className="bg-surface-container-lowest border border-outline-variant px-5 py-3.5 flex items-center gap-6 rounded-none">
+      <div className="bg-surface-container-lowest border border-outline-variant/60 px-5 py-3.5 flex items-center gap-6 rounded-sm shadow-[var(--shadow-card)]">
         
         {/* Filtro por Estado */}
         <div className="flex items-center gap-2">
@@ -260,7 +233,7 @@ export default function Dashboard() {
         </div>
 
         {/* Separador vertical de filtros */}
-        <div className="h-6 w-px bg-outline-variant" />
+        <div className="h-6 w-px bg-outline-variant/60" />
 
         {/* Filtro por Vendedor */}
         <div className="flex items-center gap-2">
@@ -281,7 +254,7 @@ export default function Dashboard() {
       </div>
 
       {/* Tabla Industrial de Presupuestos */}
-      <div className="border border-outline-variant bg-surface-container-lowest rounded-none overflow-hidden flex flex-col">
+      <div className="flex flex-col">
         <DataTable
           columns={columns}
           rows={dataRows}

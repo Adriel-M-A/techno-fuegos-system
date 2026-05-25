@@ -9,9 +9,9 @@ export default function Select({ label, className = '', children, ...props }) {
       )}
       <select
         className={`
-          px-3 py-1.5 bg-surface-container border border-border-iron
-          text-sm font-semibold text-on-surface rounded-none
-          focus:outline-none focus:border-primary-container cursor-pointer
+          px-3 py-1.5 bg-surface-container-lowest border border-outline-variant
+          text-sm font-semibold text-on-surface rounded-sm transition-all duration-200
+          focus:outline-none focus:ring-2 focus:ring-primary-container/30 focus:border-primary-container cursor-pointer
           disabled:opacity-50 disabled:cursor-not-allowed
           ${className}
         `}
