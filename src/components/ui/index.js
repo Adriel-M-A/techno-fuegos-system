@@ -11,4 +11,5 @@ export { default as CharacterCounter } from './CharacterCounter'
 export { default as Textarea }         from './Textarea'
 export { default as SearchableSelect } from './SearchableSelect'
 export { default as QuantityInput }    from './QuantityInput'
+export { default as ConfirmationModal } from './ConfirmationModal'
 

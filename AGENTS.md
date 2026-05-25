@@ -11,7 +11,7 @@
 - **Formularios y Validación:** React Hook Form + Zod (Validaciones condicionales dinámicas según se guarde plantilla o presupuesto real).
 - **Iconografía:** Lucide React (Componentes individuales importados, única fuente de iconos permitida).
 - **Documentación Interna:** React Markdown (Renderizado local de archivos .md para ayuda offline).
-- **Generación de Reportes:** jsPDF (Procesado en memoria en el frontend).
+- **Generación de Reportes:** jsPDF + jspdf-autotable (Procesado en memoria en el frontend).
 - **Runtime / Backend:** Tauri (Rust) utilizando plugins nativos `dialog` y `fs`.
 - **Base de Datos:** SQLite (Persistencia local relacional en archivo).
 - **Gestor de Paquetes:** pnpm.
@@ -22,6 +22,7 @@
 - **Estética de Componentes (Bordes y Esquinas):** Modo claro únicamente. Se implementa de forma estricta el estilo Fluent Design de Windows 10/11: esquinas suaves de `4px` (`rounded-sm`) para inputs, botones y selectores; `8px` (`rounded-md`) para tarjetas (`Cards`), contenedores y tablas; y `rounded-full` para indicadores de estado (chips de `StatusBadge`). Los contenedores y tarjetas deben usar bordes delgados con `--color-outline-variant` y sombras de elevación Fluent (`shadow-card` o `shadow-raised`) para dar profundidad visual sutil.
 - **Navegación por Zustand:** El Layout cuenta con un `sidebar` izquierdo fijo que conmuta la vista activa en el panel derecho cambiando un estado string en el store de navegación de Zustand. No destruir ni desmontar los stores globales durante la navegación para mantener la persistencia de datos en curso.
 - **Campos Opcionales en el PDF:** La lógica de generación en jsPDF debe evaluar de forma condicional si los campos informativos de la empresa o cláusulas legales configurados en la base de datos están vacíos; en tal caso, se omitirá su impresión y el cursor vertical de la hoja se reajustará automáticamente para evitar renglones en blanco.
+- **Manejo de PDF y Tablas Dinámicas:** Queda estrictamente prohibido calcular manualmente coordenadas XY píxel por píxel para renderizar la matriz de materiales crudos. Es obligatorio utilizar la librería `jspdf-autotable` montada sobre el objeto `jsPDF` para gestionar automáticamente el flujo de texto (*reflow*), la alineación técnica a la derecha con fuente monoespaciada de los totales y el salto de página automático ante desbordamientos verticales. El output final debe convertirse en un `Uint8Array` antes de enviarlo al plugin `fs` de Tauri.
 - **Lógica de Modelos (Plantillas):** El creador de presupuestos debe permitir guardar configuraciones de ítems frecuentes como plantillas asignándoles `es_plantilla: 1` omitiendo la validación obligatoria de datos de clientes, así como poder recuperarlas desde un selector en la cabecera para autopopular el formulario instantáneamente.
 - **Iconos:** Está estrictamente prohibido usar SVGs inline o cualquier otra librería de iconos. Todos los iconos deben importarse desde `lucide-react`.
 - **Vista 4 ("Manual de Ayuda"):** Accesible desde el sidebar con el icono Lucide `LifeBuoy` y regido por Zustand. Integra la documentación del manual local con `react-markdown` para asistencia offline.

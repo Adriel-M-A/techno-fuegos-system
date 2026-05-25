@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Plus, Send, Eye, Download, Pencil, RotateCcw, Trash2 } from 'lucide-react'
-import { Button, PageHeader, Select, StatusBadge } from '../components/ui'
+import { Button, PageHeader, Select, StatusBadge, ConfirmationModal } from '../components/ui'
 import { DataTable, TableActionButton, TablePagination } from '../components/table'
 import { formatARS } from '../utils/currencyFormatters'
 
@@ -26,6 +26,69 @@ export default function Dashboard() {
   const [filtroEstado, setFiltroEstado] = useState('todos')
   const [filtroVendedor, setFiltroVendedor] = useState('todos')
   const [paginaActiva, setPaginaActiva] = useState(1)
+
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'info',
+    confirmText: 'Confirmar',
+    onConfirm: () => {},
+  })
+
+  const showConfirm = ({ title, message, variant, confirmText, onConfirm }) => {
+    setModalConfig({
+      isOpen: true,
+      title,
+      message,
+      variant,
+      confirmText,
+      onConfirm: () => {
+        onConfirm()
+        setModalConfig(prev => ({ ...prev, isOpen: false }))
+      }
+    })
+  }
+
+  const handleCloseModal = () => {
+    setModalConfig(prev => ({ ...prev, isOpen: false }))
+  }
+
+  const handleRenewPresupuesto = (p) => {
+    showConfirm({
+      title: 'Renovar Presupuesto',
+      message: `¿Deseas renovar y recalcular el presupuesto número ${p.id} del cliente "${p.cliente}"? Se actualizará la validez y se recalcularán los importes según los costos vigentes de insumos.`,
+      variant: 'info',
+      confirmText: 'Renovar',
+      onConfirm: () => {
+        console.log('Renovando presupuesto...', p.id)
+      }
+    })
+  }
+
+  const handleEliminarBorrador = (p) => {
+    showConfirm({
+      title: 'Eliminar Borrador',
+      message: `¿Estás seguro de que deseas eliminar permanentemente el borrador del presupuesto para "${p.cliente}"? Esta acción no se puede deshacer.`,
+      variant: 'danger',
+      confirmText: 'Eliminar',
+      onConfirm: () => {
+        console.log('Eliminando borrador...', p.id)
+      }
+    })
+  }
+
+  const handleExportPDF = (p) => {
+    showConfirm({
+      title: 'Exportar Presupuesto',
+      message: `¿Deseas exportar y descargar el presupuesto de "${p.cliente}" en formato PDF clásico monocromático para taller?`,
+      variant: 'info',
+      confirmText: 'Exportar PDF',
+      onConfirm: () => {
+        console.log('Exportando PDF...', p.id)
+      }
+    })
+  }
 
   // Cambiar filtros y resetear la página a la primera
   const handleFiltroEstado = (val) => {
@@ -72,6 +135,7 @@ export default function Dashboard() {
             <TableActionButton
               icon={Download}
               title="Exportar PDF"
+              onClick={() => handleExportPDF(p)}
             />
           </div>
         )
@@ -98,6 +162,7 @@ export default function Dashboard() {
             <TableActionButton
               icon={RotateCcw}
               title="Renovar presupuesto"
+              onClick={() => handleRenewPresupuesto(p)}
             />
           </div>
         )
@@ -112,6 +177,7 @@ export default function Dashboard() {
               icon={Trash2}
               title="Eliminar borrador"
               variant="danger"
+              onClick={() => handleEliminarBorrador(p)}
             />
           </div>
         )
@@ -273,6 +339,17 @@ export default function Dashboard() {
           />
         )}
       </div>
+
+      {/* Modal de confirmación global para el Dashboard */}
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        variant={modalConfig.variant}
+        confirmText={modalConfig.confirmText}
+        onConfirm={modalConfig.onConfirm}
+        onCancel={handleCloseModal}
+      />
     </div>
   )
 }

@@ -1,4 +1,5 @@
-import { Button } from '../../components/ui'
+import { useState } from 'react'
+import { Button, ConfirmationModal } from '../../components/ui'
 import { Info, HardDrive, Download, Upload, AlertTriangle, History, Database, ShieldCheck } from 'lucide-react'
 
 /**
@@ -6,6 +7,57 @@ import { Info, HardDrive, Download, Upload, AlertTriangle, History, Database, Sh
  * Renderiza el panel de seguridad de base de datos, copias de seguridad de respaldo e integridad del sistema.
  */
 export default function SubvistaSoporte() {
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'info',
+    confirmText: 'Confirmar',
+    onConfirm: () => {},
+  })
+
+  const showConfirm = ({ title, message, variant, confirmText, onConfirm }) => {
+    setModalConfig({
+      isOpen: true,
+      title,
+      message,
+      variant,
+      confirmText,
+      onConfirm: () => {
+        onConfirm()
+        setModalConfig(prev => ({ ...prev, isOpen: false }))
+      }
+    })
+  }
+
+  const handleCloseModal = () => {
+    setModalConfig(prev => ({ ...prev, isOpen: false }))
+  }
+
+  const handleExportDB = () => {
+    showConfirm({
+      title: 'Exportar Base de Datos',
+      message: '¿Deseas generar y descargar una copia de seguridad física (.db) de la base de datos actual? Este archivo contendrá todas las recetas, materiales e historial del taller.',
+      variant: 'info',
+      confirmText: 'Exportar copia',
+      onConfirm: () => {
+        console.log('Exportando base de datos bit a bit a través del canal IPC de Tauri...')
+      }
+    })
+  }
+
+  const handleImportDB = () => {
+    showConfirm({
+      title: 'ADVERTENCIA: Importar Base de Datos',
+      message: '¿Estás completamente seguro de que deseas importar una base de datos externa? Esta acción es irreversible, reemplazará permanentemente todas tus recetas, materiales e historial por el contenido de la copia de seguridad, y forzará un reinicio completo del sistema.',
+      variant: 'danger',
+      confirmText: 'IMPORTAR Y REINICIAR',
+      onConfirm: () => {
+        console.log('Importando base de datos y forzando reinicio del sistema...')
+      }
+    })
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
@@ -59,7 +111,7 @@ export default function SubvistaSoporte() {
             </div>
 
             {/* Botón de Acción */}
-            <Button variant="primary" className="w-full justify-center gap-2 cursor-pointer py-2">
+            <Button variant="primary" className="w-full justify-center gap-2 cursor-pointer py-2" onClick={handleExportDB}>
               <Download size={16} />
               DESCARGAR ARCHIVO .DB
             </Button>
@@ -97,7 +149,7 @@ export default function SubvistaSoporte() {
             </div>
 
             {/* Botón de Acción */}
-            <Button variant="secondary" className="w-full justify-center gap-2 cursor-pointer py-2 border border-outline-variant">
+            <Button variant="secondary" className="w-full justify-center gap-2 cursor-pointer py-2 border border-outline-variant" onClick={handleImportDB}>
               <History size={16} />
               SELECCIONAR ARCHIVO
             </Button>
@@ -147,6 +199,17 @@ export default function SubvistaSoporte() {
           </div>
         </div>
       </div>
+
+      {/* Modal de confirmación para soporte */}
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        variant={modalConfig.variant}
+        confirmText={modalConfig.confirmText}
+        onConfirm={modalConfig.onConfirm}
+        onCancel={handleCloseModal}
+      />
     </div>
   )
 }

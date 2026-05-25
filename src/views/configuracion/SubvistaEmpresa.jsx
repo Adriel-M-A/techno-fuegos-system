@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Card, Input, Divider, Textarea, QuantityInput } from '../../components/ui'
+import { Button, Card, Input, Divider, Textarea, QuantityInput, ConfirmationModal } from '../../components/ui'
 
 const INITIAL_EMPRESA = {
   nombre: 'Techno Fuegos',
@@ -28,18 +28,85 @@ export default function SubvistaEmpresa() {
   const [parametros, setParametros] = useState(INITIAL_PARAMETROS)
   const [parametrosGuardados, setParametrosGuardados] = useState(INITIAL_PARAMETROS)
 
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'info',
+    confirmText: 'Confirmar',
+    onConfirm: () => {},
+  })
+
+  const showConfirm = ({ title, message, variant, confirmText, onConfirm }) => {
+    setModalConfig({
+      isOpen: true,
+      title,
+      message,
+      variant,
+      confirmText,
+      onConfirm: () => {
+        onConfirm()
+        setModalConfig(prev => ({ ...prev, isOpen: false }))
+      }
+    })
+  }
+
+  const handleCloseModal = () => {
+    setModalConfig(prev => ({ ...prev, isOpen: false }))
+  }
+
   // Comparación de cambios en caliente
   const hasEmpresaChanges = JSON.stringify(empresa) !== JSON.stringify(empresaGuardada)
   const hasParametrosChanges = JSON.stringify(parametros) !== JSON.stringify(parametrosGuardados)
 
   const handleSaveEmpresa = () => {
-    setEmpresaGuardada(empresa)
-    console.log('Datos comerciales guardados en memoria:', empresa)
+    showConfirm({
+      title: 'Guardar Datos de la Empresa',
+      message: '¿Deseas guardar los datos comerciales de la empresa? Se mostrarán en la cabecera de todos los presupuestos emitidos.',
+      variant: 'success',
+      confirmText: 'Guardar',
+      onConfirm: () => {
+        setEmpresaGuardada(empresa)
+        console.log('Datos comerciales guardados en memoria:', empresa)
+      }
+    })
+  }
+
+  const handleDiscardEmpresa = () => {
+    showConfirm({
+      title: 'Descartar cambios de la empresa',
+      message: '¿Estás seguro de que deseas revertir los cambios en los datos de la empresa? Se perderán las modificaciones no guardadas.',
+      variant: 'warning',
+      confirmText: 'Descartar',
+      onConfirm: () => {
+        setEmpresa(empresaGuardada)
+      }
+    })
   }
 
   const handleSaveParametros = () => {
-    setParametrosGuardados(parametros)
-    console.log('Parámetros PDF guardados en memoria:', parametros)
+    showConfirm({
+      title: 'Guardar parámetros del PDF',
+      message: '¿Deseas guardar los parámetros y cláusulas legales del presupuesto PDF?',
+      variant: 'success',
+      confirmText: 'Guardar',
+      onConfirm: () => {
+        setParametrosGuardados(parametros)
+        console.log('Parámetros PDF guardados en memoria:', parametros)
+      }
+    })
+  }
+
+  const handleDiscardParametros = () => {
+    showConfirm({
+      title: 'Descartar cambios de parámetros',
+      message: '¿Estás seguro de que deseas revertir los cambios en los parámetros del PDF? Se perderán las modificaciones no guardadas.',
+      variant: 'warning',
+      confirmText: 'Descartar',
+      onConfirm: () => {
+        setParametros(parametrosGuardados)
+      }
+    })
   }
 
   const handleFieldChangeEmpresa = (field, val) => {
@@ -51,6 +118,7 @@ export default function SubvistaEmpresa() {
   }
 
   return (
+
     <div className="flex flex-col gap-6">
       
       {/* Datos Comerciales */}
@@ -99,7 +167,7 @@ export default function SubvistaEmpresa() {
         <Divider className="my-4" />
         <div className="flex justify-end gap-3">
           {hasEmpresaChanges && (
-            <Button variant="secondary" onClick={() => setEmpresa(empresaGuardada)}>
+            <Button variant="secondary" onClick={handleDiscardEmpresa}>
               Descartar
             </Button>
           )}
@@ -151,7 +219,7 @@ export default function SubvistaEmpresa() {
         <Divider className="my-4" />
         <div className="flex justify-end gap-3">
           {hasParametrosChanges && (
-            <Button variant="secondary" onClick={() => setParametros(parametrosGuardados)}>
+            <Button variant="secondary" onClick={handleDiscardParametros}>
               Descartar
             </Button>
           )}
@@ -161,6 +229,16 @@ export default function SubvistaEmpresa() {
         </div>
       </Card>
       
+      {/* Modal de confirmación global para empresa y parámetros */}
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        variant={modalConfig.variant}
+        confirmText={modalConfig.confirmText}
+        onConfirm={modalConfig.onConfirm}
+        onCancel={handleCloseModal}
+      />
     </div>
   )
 }

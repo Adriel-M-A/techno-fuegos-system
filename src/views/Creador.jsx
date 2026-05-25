@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Save, FileDown, Plus } from 'lucide-react'
-import { Button, Card, PageHeader, Input, Divider, Select, Textarea } from '../components/ui'
+import { Button, Card, PageHeader, Input, Divider, Select, Textarea, ConfirmationModal } from '../components/ui'
 import ProductsTable, { CATALOGO_PRODUCTOS } from '../components/table/ProductsTable'
 import { formatARS } from '../utils/currencyFormatters'
 
@@ -9,6 +9,33 @@ export default function Creador() {
   const [productRows, setProductRows] = useState([
     { id: crypto.randomUUID(), productId: '', quantity: 1, unitPrice: 0 }
   ]);
+
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'info',
+    confirmText: 'Confirmar',
+    onConfirm: () => {},
+  });
+
+  const showConfirm = ({ title, message, variant, confirmText, onConfirm }) => {
+    setModalConfig({
+      isOpen: true,
+      title,
+      message,
+      variant,
+      confirmText,
+      onConfirm: () => {
+        onConfirm();
+        setModalConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
+
+  const handleCloseModal = () => {
+    setModalConfig(prev => ({ ...prev, isOpen: false }));
+  };
 
   const handleAddProductRow = () => {
     setProductRows(prev => [
@@ -34,12 +61,57 @@ export default function Creador() {
   };
 
   const handleDeleteProductRow = (rowId) => {
-    setProductRows(prev => prev.filter(row => row.id !== rowId));
+    showConfirm({
+      title: 'Eliminar producto',
+      message: '¿Estás seguro de que deseas quitar este producto o servicio del presupuesto actual?',
+      variant: 'danger',
+      confirmText: 'Eliminar',
+      onConfirm: () => {
+        setProductRows(prev => prev.filter(row => row.id !== rowId));
+      }
+    });
+  };
+
+  const handleSaveTemplate = () => {
+    showConfirm({
+      title: 'Guardar como plantilla',
+      message: '¿Deseas guardar la configuración de ítems frecuentes de este presupuesto como una plantilla reutilizable?',
+      variant: 'success',
+      confirmText: 'Guardar plantilla',
+      onConfirm: () => {
+        console.log('Guardando plantilla...', productRows);
+      }
+    });
+  };
+
+  const handleSaveDraft = () => {
+    showConfirm({
+      title: 'Guardar borrador',
+      message: '¿Deseas guardar el estado actual de este presupuesto como un borrador?',
+      variant: 'info',
+      confirmText: 'Guardar borrador',
+      onConfirm: () => {
+        console.log('Guardando borrador...', productRows);
+      }
+    });
+  };
+
+  const handleExportPDF = () => {
+    showConfirm({
+      title: 'Exportar presupuesto',
+      message: '¿Deseas generar y descargar el reporte del presupuesto en formato PDF monocromático para taller?',
+      variant: 'info',
+      confirmText: 'Exportar PDF',
+      onConfirm: () => {
+        console.log('Exportando PDF...', productRows);
+      }
+    });
   };
 
   const subtotalItems = productRows.reduce((sum, row) => sum + (row.unitPrice * row.quantity), 0);
   const total = subtotalItems; // Por ahora sin modificadores
   const isLastRowEmpty = productRows.length > 0 && productRows[productRows.length - 1].productId === '';
+
 
   return (
     <div className="p-6 flex flex-col gap-4">
@@ -185,21 +257,32 @@ export default function Creador() {
 
         {/* Acciones principales a la derecha */}
         <div className="flex items-center gap-3">
-          <Button variant="secondary" size="md" disabled={total === 0}>
+          <Button variant="secondary" size="md" disabled={total === 0} onClick={handleSaveTemplate}>
             <Save size={15} />
             Guardar Plantilla
           </Button>
-          <Button variant="secondary" size="md" disabled={total === 0}>
+          <Button variant="secondary" size="md" disabled={total === 0} onClick={handleSaveDraft}>
             <Save size={15} />
             Guardar Borrador
           </Button>
-          <Button variant="primary" size="md" disabled={total === 0}>
+          <Button variant="primary" size="md" disabled={total === 0} onClick={handleExportPDF}>
             <FileDown size={15} />
             Exportar PDF
           </Button>
         </div>
 
       </div>
+
+      {/* Modal de confirmación para las acciones de la vista */}
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        variant={modalConfig.variant}
+        confirmText={modalConfig.confirmText}
+        onConfirm={modalConfig.onConfirm}
+        onCancel={handleCloseModal}
+      />
 
     </div>
   )

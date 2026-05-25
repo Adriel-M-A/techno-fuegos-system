@@ -21,6 +21,7 @@ Este documento registra de forma detallada el progreso actual del proyecto **Tec
 - [x] Instalar `react-markdown` para renderizar el manual de usuario sin dependencias de red.
 - [x] Instalar `react-hook-form` y `zod` junto con su resolver en `package.json` para formularios estructurados.
 - [x] Crear y documentar utilidades de formateo global de datos en `src/utils/` (`formatARS`, `currencyFormatters`, `textFormatters`).
+- [x] Instalar `jspdf-autotable` en `package.json` como complemento estructural para el procesamiento dinámico de la grilla de materiales.
 
 ---
 
@@ -63,9 +64,6 @@ Este documento registra de forma detallada el progreso actual del proyecto **Tec
 ---
 
 ## Fase 5: Reportes PDF e Integración con el Sistema Operativo
-- [ ] Diseñar y programar la lógica del documento PDF utilizando `jsPDF`:
-  - [ ] Configurar estética clásica monocromática en blanco y negro para maximizar contraste y ahorrar tinta en taller.
-  - [ ] Implementar la tabla de desglose estricto de materiales crudos (kilos de chapa, metros de perfiles, insumos) y horas de mano de obra en taller, en lugar de nombres de productos de catálogo largos.
-  - [ ] Incluir el bloque físico de la "Descripción General" en la cabecera, antes de la matriz numérica.
+- [ ] Programar la lógica del documento PDF unificando `jsPDF` y `jspdf-autotable` en formato clásico monocromático (blanco y negro), inyectando dinámicamente la Descripción General y asegurando el salto de página prolijo del desglose físico de insumos.
 - [ ] Implementar la descarga y almacenamiento físico del PDF en disco interactuando con los diálogos del sistema a través de plugins `dialog` and `fs` de Tauri.
 - [ ] Vincular la ayuda interna para renderizarla usando `react-markdown` y los archivos locales `.md` en la Vista 4.

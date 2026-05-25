@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Trash2 } from 'lucide-react'
 import DataTable from './DataTable'
 import TableActionButton from './TableActionButton'
-import { Input, Select } from '../ui'
+import { Input, Select, ConfirmationModal } from '../ui'
 
 // Opciones de unidades válidas para los materiales/insumos
 export const UNIDADES = [
@@ -63,6 +63,8 @@ function CostoInput({ value, onChange }) {
  * Todos los campos de cada fila son editables directamente.
  */
 export default function InsumosTable({ rows, onFieldChange, onDeleteRow }) {
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+
   // Columnas estructuradas para DataTable
   const columns = [
     { key: 'material', label: 'MATERIAL' },
@@ -109,16 +111,33 @@ export default function InsumosTable({ rows, onFieldChange, onDeleteRow }) {
         icon={Trash2}
         title="Eliminar insumo"
         variant="danger"
-        onClick={() => onDeleteRow(row.id)}
+        onClick={() => setConfirmDeleteId(row.id)}
       />
     ),
   }))
 
   return (
-    <DataTable
-      columns={columns}
-      rows={dataTableRows}
-      emptyMessage="No hay insumos registrados. Añade un nuevo insumo para comenzar."
-    />
+    <>
+      <DataTable
+        columns={columns}
+        rows={dataTableRows}
+        emptyMessage="No hay insumos registrados. Añade un nuevo insumo para comenzar."
+      />
+
+      <ConfirmationModal
+        isOpen={confirmDeleteId !== null}
+        title="Confirmar eliminación"
+        message="¿Estás seguro de que deseas eliminar este insumo? Esta acción es destructiva y modificará la planilla actual de materiales."
+        variant="danger"
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={() => {
+          onDeleteRow(confirmDeleteId)
+          setConfirmDeleteId(null)
+        }}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
+    </>
   )
 }
+

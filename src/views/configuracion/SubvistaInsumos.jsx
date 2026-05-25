@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Button, Card } from '../../components/ui'
+import { Button, Card, ConfirmationModal } from '../../components/ui'
 import { Plus } from 'lucide-react'
 import { InsumosTable, TableFooterActions } from '../../components/table'
+
 
 // Insumos mock de base con materiales típicos de herrería
 const MOCK_INSUMOS = [
@@ -19,6 +20,33 @@ const MOCK_INSUMOS = [
 export default function SubvistaInsumos() {
   const [insumos, setInsumos] = useState(MOCK_INSUMOS)
   const [insumosGuardados, setInsumosGuardados] = useState(MOCK_INSUMOS)
+
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'info',
+    confirmText: 'Confirmar',
+    onConfirm: () => {},
+  })
+
+  const showConfirm = ({ title, message, variant, confirmText, onConfirm }) => {
+    setModalConfig({
+      isOpen: true,
+      title,
+      message,
+      variant,
+      confirmText,
+      onConfirm: () => {
+        onConfirm()
+        setModalConfig(prev => ({ ...prev, isOpen: false }))
+      }
+    })
+  }
+
+  const handleCloseModal = () => {
+    setModalConfig(prev => ({ ...prev, isOpen: false }))
+  }
 
   // Agregar una nueva fila de insumo vacía
   const handleAddRow = () => {
@@ -47,13 +75,29 @@ export default function SubvistaInsumos() {
 
   // Guardar los materiales en memoria (estado persistido local)
   const handleSave = () => {
-    setInsumosGuardados(insumos)
-    console.log('Insumos guardados en memoria del componente:', insumos)
+    showConfirm({
+      title: 'Guardar Materiales',
+      message: '¿Deseas guardar los costos de insumos y materiales actuales? Estos se aplicarán en todos los nuevos presupuestos creados.',
+      variant: 'success',
+      confirmText: 'Guardar',
+      onConfirm: () => {
+        setInsumosGuardados(insumos)
+        console.log('Insumos guardados en memoria del componente:', insumos)
+      }
+    })
   }
 
   // Descartar cambios y revertir al último estado guardado
   const handleDiscard = () => {
-    setInsumos(insumosGuardados)
+    showConfirm({
+      title: 'Descartar Cambios',
+      message: '¿Estás seguro de que deseas revertir todos los cambios realizados? Se perderán las modificaciones no guardadas.',
+      variant: 'warning',
+      confirmText: 'Descartar',
+      onConfirm: () => {
+        setInsumos(insumosGuardados)
+      }
+    })
   }
 
   const hasChanges = JSON.stringify(insumos) !== JSON.stringify(insumosGuardados)
@@ -97,6 +141,17 @@ export default function SubvistaInsumos() {
           El ABM de productos estándar se implementará en la próxima iteración.
         </p>
       </Card>
+
+      {/* Modal de confirmación global para insumos */}
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        variant={modalConfig.variant}
+        confirmText={modalConfig.confirmText}
+        onConfirm={modalConfig.onConfirm}
+        onCancel={handleCloseModal}
+      />
     </div>
   )
 }
