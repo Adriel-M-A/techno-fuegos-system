@@ -16,7 +16,7 @@ Este documento registra de forma detallada el progreso actual del proyecto **Tec
 
 ## Fase 2: Configuración del Frontend Estricto y Dependencias
 - [x] Instalar `zustand` e implementar el store de navegación global por estado interno para el Layout del Sidebar (sin rutas URL web).
-- [x] Diseñar la interfaz base nativa: Sidebar izquierdo (`w-60`, fondo `#f3f3f3`) con efectos de hover e indicador activo industrial, y panel derecho dinámico.
+- [x] Diseñar la interfaz base nativa: Sidebar izquierdo (`w-60`, fondo `#f2f4f6`) con efectos de hover e indicador activo industrial, y panel derecho dinámico.
 - [x] Instalar e integrar `lucide-react` como único proveedor de iconos en el frontend.
 - [x] Instalar `react-markdown` para renderizar el manual de usuario sin dependencias de red.
 - [x] Instalar `react-hook-form` y `zod` junto con su resolver en `package.json` para formularios estructurados.

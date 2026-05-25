@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Save, FileDown, Plus } from 'lucide-react'
-import { Button, Card, PageHeader, Input, Divider } from '../components/ui'
+import { Button, Card, PageHeader, Input, Divider, Select } from '../components/ui'
 import ProductsTable, { CATALOGO_PRODUCTOS } from '../components/ProductsTable'
 import { formatARS } from '../utils/currencyFormatters'
 
@@ -54,15 +54,15 @@ export default function Creador() {
             <span className="label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider select-none shrink-0">
               Plantilla:
             </span>
-            <select
-              className="px-3 py-1.5 bg-surface-container border border-border-iron text-sm font-semibold text-on-surface rounded-none focus:outline-none focus:border-primary-container cursor-pointer min-w-[180px]"
+            <Select
+              className="min-w-[180px] !py-1.5"
               defaultValue=""
             >
               <option value="">Sin plantilla</option>
               <option value="reja-estandar">Presupuesto Rejas Estándar</option>
               <option value="porton-herreria">Presupuesto Portón Herrería</option>
               <option value="baranda-seguridad">Presupuesto Baranda Seguridad</option>
-            </select>
+            </Select>
           </div>
 
           {/* Separador vertical de cabecera */}
@@ -135,20 +135,16 @@ export default function Creador() {
         {/* Sección D — Control y Logística */}
         <Card title="Control y Logística">
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="label-md text-on-surface-variant uppercase tracking-wide">
-                Vendedor
-              </label>
-              <select
-                className="w-full px-3 py-2 text-sm text-on-surface bg-surface-container-lowest border border-border-iron rounded focus:outline-none focus:border-primary-container cursor-pointer"
-                defaultValue=""
-              >
-                <option value="" disabled>Seleccionar vendedor</option>
-                <option value="juan-perez">Juan Pérez</option>
-                <option value="maria-gomez">María Gómez</option>
-                <option value="carlos-rodriguez">Carlos Rodríguez</option>
-              </select>
-            </div>
+            <Select
+              label="Vendedor"
+              className="w-full bg-surface-container-lowest focus:border-primary-container"
+              defaultValue=""
+            >
+              <option value="" disabled>Seleccionar vendedor</option>
+              <option value="juan-perez">Juan Pérez</option>
+              <option value="maria-gomez">María Gómez</option>
+              <option value="carlos-rodriguez">Carlos Rodríguez</option>
+            </Select>
             <div className="flex flex-col gap-1">
               <label className="label-md text-on-surface-variant uppercase tracking-wide">
                 Observaciones

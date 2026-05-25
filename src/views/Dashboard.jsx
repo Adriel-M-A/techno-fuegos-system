@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Plus, Send, Eye, Download, Pencil, RotateCcw, Trash2 } from 'lucide-react'
-import { Button, PageHeader } from '../components/ui'
+import { Button, PageHeader, Select } from '../components/ui'
 import { formatARS } from '../utils/currencyFormatters'
 
 // Datos mock de demostración basados en la imagen de referencia (sin ID de cliente y con estado entregado)
@@ -31,25 +31,25 @@ export default function Dashboard() {
     switch (status) {
       case 'aceptado':
         return (
-          <span className="border border-[#2e7d32] text-[#2e7d32] bg-[#2e7d32]/5 px-2.5 py-0.5 label-lg text-xs font-bold tracking-wider rounded-none uppercase select-none inline-block">
+          <span className="border border-success text-success bg-success/5 px-2.5 py-0.5 label-lg text-xs font-bold tracking-wider rounded-none uppercase select-none inline-block">
             Aceptado
           </span>
         )
       case 'entregado':
         return (
-          <span className="border border-[#004fa2] text-[#004fa2] bg-[#004fa2]/5 px-2.5 py-0.5 label-lg text-xs font-bold tracking-wider rounded-none uppercase select-none inline-block">
+          <span className="border border-primary text-primary bg-primary/5 px-2.5 py-0.5 label-lg text-xs font-bold tracking-wider rounded-none uppercase select-none inline-block">
             Entregado
           </span>
         )
       case 'vencido':
         return (
-          <span className="border border-[#b34700] text-[#b34700] bg-[#b34700]/5 px-2.5 py-0.5 label-lg text-xs font-bold tracking-wider rounded-none uppercase select-none inline-block">
+          <span className="border border-tertiary text-tertiary bg-tertiary/5 px-2.5 py-0.5 label-lg text-xs font-bold tracking-wider rounded-none uppercase select-none inline-block">
             Vencido
           </span>
         )
       case 'borrador':
         return (
-          <span className="border border-[#5f5e5e] text-[#5f5e5e] bg-[#5f5e5e]/5 px-2.5 py-0.5 label-lg text-xs font-bold tracking-wider rounded-none uppercase select-none inline-block">
+          <span className="border border-secondary text-secondary bg-secondary/5 px-2.5 py-0.5 label-lg text-xs font-bold tracking-wider rounded-none uppercase select-none inline-block">
             Borrador
           </span>
         )
@@ -174,7 +174,7 @@ export default function Dashboard() {
             <span className="label-lg text-xs text-on-surface-variant font-semibold tracking-wider uppercase">
               Presupuestos Entregados
             </span>
-            <Send className="text-[#8c3600]" size={16} />
+            <Send className="text-primary" size={16} />
           </div>
           <span className="text-3xl font-extrabold text-on-surface font-mono mono-data tracking-tight select-all">
             14
@@ -212,17 +212,17 @@ export default function Dashboard() {
           <span className="label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider select-none">
             Filtrar por:
           </span>
-          <select
+          <Select
             value={filtroEstado}
             onChange={(e) => setFiltroEstado(e.target.value)}
-            className="px-3 py-1.5 bg-surface-container border border-border-iron text-sm font-semibold text-on-surface rounded-none focus:outline-none focus:border-primary-container cursor-pointer min-w-[160px]"
+            className="min-w-[160px] !py-1.5"
           >
             <option value="todos">Todos los Estados</option>
             <option value="aceptado">Aceptado</option>
             <option value="entregado">Entregado</option>
             <option value="vencido">Vencido</option>
             <option value="borrador">Borrador</option>
-          </select>
+          </Select>
         </div>
 
         {/* Separador vertical de filtros */}
@@ -233,15 +233,15 @@ export default function Dashboard() {
           <span className="label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider select-none">
             Vendedor:
           </span>
-          <select
+          <Select
             value={filtroVendedor}
             onChange={(e) => setFiltroVendedor(e.target.value)}
-            className="px-3 py-1.5 bg-surface-container border border-border-iron text-sm font-semibold text-on-surface rounded-none focus:outline-none focus:border-primary-container cursor-pointer min-w-[160px]"
+            className="min-w-[160px] !py-1.5"
           >
             <option value="todos">Todos</option>
             <option value="Ing. Carlos Ruiz">Ing. Carlos Ruiz</option>
             <option value="Arq. Elena Soto">Arq. Elena Soto</option>
-          </select>
+          </Select>
         </div>
 
       </div>
@@ -319,7 +319,7 @@ export default function Dashboard() {
             <button className="px-3 py-1.5 text-xs font-semibold text-on-surface bg-surface-container-lowest border border-border-iron hover:bg-surface-container-low transition-colors duration-150 cursor-pointer rounded-none select-none">
               Anterior
             </button>
-            <button className="px-3 py-1.5 text-xs font-bold text-white bg-[#8c3600] border border-[#8c3600] cursor-pointer rounded-none select-none">
+            <button className="px-3 py-1.5 text-xs font-bold text-white bg-primary border border-primary cursor-pointer rounded-none select-none">
               1
             </button>
             <button className="px-3 py-1.5 text-xs font-semibold text-on-surface bg-surface-container-lowest border border-border-iron hover:bg-surface-container-low transition-colors duration-150 cursor-pointer rounded-none select-none">

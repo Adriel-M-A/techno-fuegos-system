@@ -12,15 +12,15 @@ El sistema utiliza **modo claro únicamente**. No existe modo oscuro.
 ### Colores principales
 | Token | Valor hex | Uso |
 | --- | --- | --- |
-| `primary` | `#8c3600` | Acciones primarias, estado activo |
-| `primary-container` | `#b34700` | Botones primarios, CTAs, fondo activo sidebar |
+| `primary` | `#005bbf` | Acciones primarias, estado activo, marca principal azul |
+| `primary-container` | `#1a73e8` | Botones primarios, CTAs, fondo interactivo |
 | `on-primary` | `#ffffff` | Texto sobre fondos primary |
-| `on-primary-container` | `#ffe4d9` | Texto sobre primary-container |
-| `secondary` | `#5f5e5e` | Texto secundario, elementos de soporte |
-| `secondary-container` | `#e2dfde` | Hover en items de navegación |
-| `on-secondary-container` | `#636262` | Texto sobre secondary-container |
-| `tertiary` | `#004fa2` | Acciones secundarias |
-| `tertiary-container` | `#0066cf` | Botones terciarios, links, indicadores informativos |
+| `on-primary-container` | `#ffffff` | Texto sobre primary-container |
+| `secondary` | `#515f74` | Elementos de soporte, texto secundario |
+| `secondary-container` | `#d5e3fc` | Hover en ítems de navegación, fondos secundarios sutiles |
+| `on-secondary-container` | `#57657a` | Texto sobre secondary-container |
+| `tertiary` | `#9e4300` | Acciones secundarias, color óxido industrial |
+| `tertiary-container` | `#c55500` | Botones terciarios, links informativos óxido |
 | `on-tertiary` | `#ffffff` | Texto sobre fondos tertiary |
 | `error` | `#ba1a1a` | Estados de error |
 | `error-container` | `#ffdad6` | Fondos de mensajes de error |
@@ -29,17 +29,17 @@ El sistema utiliza **modo claro únicamente**. No existe modo oscuro.
 ### Colores de superficie
 | Token | Valor hex | Uso |
 | --- | --- | --- |
-| `background` | `#f9f9f9` | Fondo general de la aplicación |
-| `surface` | `#f9f9f9` | Superficie base |
+| `background` | `#f7f9fb` | Fondo general de la aplicación |
+| `surface` | `#f7f9fb` | Superficie base |
 | `surface-container-lowest` | `#ffffff` | Tarjetas, modales, paneles principales |
-| `surface-container-low` | `#f3f3f3` | Sidebar, headers de cards |
-| `surface-container` | `#eeeeee` | Contenedores secundarios |
-| `surface-container-high` | `#e8e8e8` | Contenedores elevados |
-| `on-surface` | `#1a1c1c` | Texto principal |
-| `on-surface-variant` | `#574239` | Texto secundario, subtítulos |
-| `outline` | `#8b7267` | Bordes de inputs en foco |
-| `outline-variant` | `#dfc0b4` | Bordes sutiles, divisores |
-| `surface-tint` | `#a23f00` | Tinte de superficie activa |
+| `surface-container-low` | `#f2f4f6` | Sidebar, cabeceras secundarias |
+| `surface-container` | `#eceef0` | Contenedores secundarios, cajas técnicas |
+| `surface-container-high` | `#e6e8ea` | Contenedores elevados, hovers sutiles |
+| `on-surface` | `#191c1e` | Texto principal |
+| `on-surface-variant` | `#414754` | Texto secundario de soporte |
+| `outline` | `#727785` | Bordes de inputs en foco |
+| `outline-variant` | `#c1c6d6` | Bordes sutiles, divisores |
+| `surface-tint` | `#005bc0` | Tinte de superficie activa |
 
 ---
 
@@ -50,23 +50,35 @@ El sistema utiliza **modo claro únicamente**. No existe modo oscuro.
 
 @theme {
   /* Primary */
-  --color-primary: #8c3600;
-  --color-primary-container: #b34700;
+  --color-primary: #005bbf;
+  --color-primary-container: #1a73e8;
   --color-on-primary: #ffffff;
-  --color-on-primary-container: #ffe4d9;
-  --color-inverse-primary: #ffb695;
+  --color-on-primary-container: #ffffff;
+  --color-inverse-primary: #adc7ff;
+  --color-primary-fixed: #d8e2ff;
+  --color-primary-fixed-dim: #adc7ff;
+  --color-on-primary-fixed: #001a41;
+  --color-on-primary-fixed-variant: #004493;
 
   /* Secondary */
-  --color-secondary: #5f5e5e;
+  --color-secondary: #515f74;
   --color-on-secondary: #ffffff;
-  --color-secondary-container: #e2dfde;
-  --color-on-secondary-container: #636262;
+  --color-secondary-container: #d5e3fc;
+  --color-on-secondary-container: #57657a;
+  --color-secondary-fixed: #d5e3fc;
+  --color-secondary-fixed-dim: #b9c7df;
+  --color-on-secondary-fixed: #0d1c2e;
+  --color-on-secondary-fixed-variant: #3a485b;
 
   /* Tertiary */
-  --color-tertiary: #004fa2;
-  --color-tertiary-container: #0066cf;
+  --color-tertiary: #9e4300;
+  --color-tertiary-container: #c55500;
   --color-on-tertiary: #ffffff;
-  --color-on-tertiary-container: #e1e9ff;
+  --color-on-tertiary-container: #0e0200;
+  --color-tertiary-fixed: #ffdbcb;
+  --color-tertiary-fixed-dim: #ffb691;
+  --color-on-tertiary-fixed: #341100;
+  --color-on-tertiary-fixed-variant: #783100;
 
   /* Error */
   --color-error: #ba1a1a;
@@ -75,18 +87,19 @@ El sistema utiliza **modo claro únicamente**. No existe modo oscuro.
   --color-on-error-container: #93000a;
 
   /* Surface */
-  --color-background: #f9f9f9;
-  --color-surface: #f9f9f9;
+  --color-background: #f7f9fb;
+  --color-surface: #f7f9fb;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f3f3f3;
-  --color-surface-container: #eeeeee;
-  --color-surface-container-high: #e8e8e8;
-  --color-surface-container-highest: #e2e2e2;
-  --color-on-surface: #1a1c1c;
-  --color-on-surface-variant: #574239;
-  --color-outline: #8b7267;
-  --color-outline-variant: #dfc0b4;
-  --color-surface-tint: #a23f00;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container: #eceef0;
+  --color-surface-container-high: #e6e8ea;
+  --color-surface-container-highest: #e0e3e5;
+  --color-on-surface: #191c1e;
+  --color-on-surface-variant: #414754;
+  --color-outline: #727785;
+  --color-outline-variant: #c1c6d6;
+  --color-border-iron: #c1c6d6;
+  --color-surface-tint: #005bc0;
 
   /* Tipografías */
   --font-display: "Inter", sans-serif;

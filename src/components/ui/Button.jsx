@@ -12,7 +12,7 @@ export default function Button({
   const base = `
     inline-flex items-center justify-center gap-2 font-medium
     transition-colors duration-150 cursor-pointer select-none
-    rounded focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed
+    rounded-none focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed
   `
 
   // Tamaños disponibles

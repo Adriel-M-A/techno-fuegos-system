@@ -7,4 +7,5 @@ export { default as StatusBadge } from './StatusBadge'
 export { default as DataTable }   from './DataTable'
 export { default as Divider }     from './Divider'
 export { default as TabBar }      from './TabBar'
+export { default as Select }      from './Select'
 

@@ -1,44 +1,42 @@
-// Configuración de estados de presupuesto con colores e indicadores
+// Configuración de estados de presupuesto con clases CSS semánticas de Tailwind v4
 const STATUS_CONFIG = {
   borrador: {
     label: 'Borrador',
-    color: '#5f5e5e',
-    bg: '#eeeeee',
-    dot: '#5f5e5e',
+    textClass: 'text-secondary',
+    bgClass: 'bg-surface-container',
+    dotClass: 'bg-secondary',
   },
   enviado: {
     label: 'Enviado',
-    color: '#004fa2',
-    bg: '#e1e9ff',
-    dot: '#004fa2',
+    textClass: 'text-primary',
+    bgClass: 'bg-secondary-container/40',
+    dotClass: 'bg-primary',
   },
   aceptado: {
     label: 'Aceptado',
-    color: '#2e7d32',
-    bg: '#e8f5e9',
-    dot: '#2e7d32',
+    textClass: 'text-success',
+    bgClass: 'bg-success/10',
+    dotClass: 'bg-success',
   },
   vencido: {
     label: 'Vencido',
-    color: '#b34700',
-    bg: '#ffe4d9',
-    dot: '#b34700',
+    textClass: 'text-tertiary',
+    bgClass: 'bg-tertiary-fixed',
+    dotClass: 'bg-tertiary',
   },
 }
 
-// Componente StatusBadge: indicador visual de estado de presupuesto
+// Componente StatusBadge: indicador visual de estado de presupuesto sin colores hardcodeados
 export default function StatusBadge({ status }) {
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.borrador
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm label-md uppercase tracking-wide"
-      style={{ color: config.color, backgroundColor: config.bg }}
+      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm label-md uppercase tracking-wide ${config.textClass} ${config.bgClass}`}
     >
       {/* Indicador cuadrado tipo LED */}
       <span
-        className="w-1.5 h-1.5 shrink-0"
-        style={{ backgroundColor: config.dot }}
+        className={`w-1.5 h-1.5 shrink-0 ${config.dotClass}`}
       />
       {config.label}
     </span>

@@ -1,7 +1,7 @@
 // Componente Card con header y body separados por divisor
 export default function Card({ title, headerActions, children, className = '' }) {
   return (
-    <div className={`bg-surface-container-lowest border border-border-iron rounded-lg overflow-hidden ${className}`}>
+    <div className={`bg-surface-container-lowest border border-border-iron rounded-none overflow-hidden ${className}`}>
 
       {/* Header de la card: fondo gris claro con borde inferior */}
       {title && (

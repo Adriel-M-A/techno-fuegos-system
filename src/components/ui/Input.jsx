@@ -36,7 +36,7 @@ export default function Input({
         disabled={disabled}
         className={`
           w-full px-3 py-2 text-sm text-on-surface bg-surface-container-lowest
-          border rounded transition-colors duration-150
+          border rounded-none transition-colors duration-150
           placeholder:text-on-surface-variant/50
           focus:outline-none
           disabled:opacity-50 disabled:cursor-not-allowed

@@ -16,8 +16,7 @@ export default function SubvistaSoporte() {
 
         {/* Banner Informativo Superior */}
         <div
-          className="flex gap-4 p-4 border border-outline-variant rounded-none items-start bg-surface-container"
-          style={{ backgroundColor: 'rgba(179, 71, 0, 0.05)' }}
+          className="flex gap-4 p-4 border border-outline-variant rounded-none items-start bg-primary/5"
         >
           <Info className="text-primary-container shrink-0 mt-0.5" size={18} />
           <p className="body-md text-on-surface-variant leading-relaxed">
@@ -89,8 +88,7 @@ export default function SubvistaSoporte() {
 
             {/* Banner de Advertencia */}
             <div
-              className="border border-error p-3 rounded-none flex gap-3 items-start"
-              style={{ backgroundColor: 'rgba(186, 26, 26, 0.05)' }}
+              className="border border-error bg-error/5 p-3 rounded-none flex gap-3 items-start"
             >
               <AlertTriangle className="text-error shrink-0 mt-0.5" size={16} />
               <p className="text-[11px] font-bold text-error uppercase leading-tight tracking-wide">
@@ -138,12 +136,12 @@ export default function SubvistaSoporte() {
 
         {/* Columna 3: Estado de Integridad */}
         <div className="flex items-center gap-3">
-          <ShieldCheck className="text-success" size={20} style={{ color: '#2e7d32' }} />
+          <ShieldCheck className="text-success" size={20} />
           <div className="flex flex-col">
             <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
               Estado de Integridad
             </span>
-            <span className="mono-data text-[13px] font-bold mt-0.5" style={{ color: '#2e7d32' }}>
+            <span className="mono-data text-[13px] text-success font-bold mt-0.5">
               Verificado y Óptimo
             </span>
           </div>
