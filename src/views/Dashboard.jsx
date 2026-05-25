@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Plus, Send, Eye, Download, Pencil, RotateCcw, Trash2 } from 'lucide-react'
 import { Button, PageHeader, Select } from '../components/ui'
+import { DataTable, TableActionButton, TablePagination } from '../components/table'
 import { formatARS } from '../utils/currencyFormatters'
 
 // Datos mock de demostración basados en la imagen de referencia (sin ID de cliente y con estado entregado)
@@ -9,7 +10,13 @@ const PRESUPUESTOS_MOCK = [
   { id: 2, fecha: '2023-11-22', cliente: 'Minería del Norte Ltda.', total: 128000.00, vendedor: 'Arq. Elena Soto', status: 'entregado' },
   { id: 3, fecha: '2023-11-15', cliente: 'Inmobiliaria Horizonte', total: 12400.00, vendedor: 'Ing. Carlos Ruiz', status: 'vencido' },
   { id: 4, fecha: '2023-11-25', cliente: 'Logística Integral S.A.', total: 5200.00, vendedor: 'Arq. Elena Soto', status: 'borrador' },
+  { id: 5, fecha: '2023-11-26', cliente: 'Metalúrgica Pilar', total: 15400.00, vendedor: 'Ing. Carlos Ruiz', status: 'aceptado' },
+  { id: 6, fecha: '2023-11-27', cliente: 'Siderurgia del Sur', total: 98000.00, vendedor: 'Arq. Elena Soto', status: 'entregado' },
+  { id: 7, fecha: '2023-11-28', cliente: 'Inversiones Patagónicas', total: 67200.00, vendedor: 'Ing. Carlos Ruiz', status: 'borrador' },
+  { id: 8, fecha: '2023-11-29', cliente: 'Distribuidora Centro', total: 31000.00, vendedor: 'Arq. Soto Elena', status: 'aceptado' },
 ]
+
+const ITEMS_PER_PAGE = 4
 
 /**
  * Dashboard
@@ -18,6 +25,18 @@ const PRESUPUESTOS_MOCK = [
 export default function Dashboard() {
   const [filtroEstado, setFiltroEstado] = useState('todos')
   const [filtroVendedor, setFiltroVendedor] = useState('todos')
+  const [paginaActiva, setPaginaActiva] = useState(1)
+
+  // Cambiar filtros y resetear la página a la primera
+  const handleFiltroEstado = (val) => {
+    setFiltroEstado(val)
+    setPaginaActiva(1)
+  }
+
+  const handleFiltroVendedor = (val) => {
+    setFiltroVendedor(val)
+    setPaginaActiva(1)
+  }
 
   // Filtrado de presupuestos basado en las selecciones
   const presupuestosFiltrados = PRESUPUESTOS_MOCK.filter((p) => {
@@ -25,6 +44,15 @@ export default function Dashboard() {
     const coincideVendedor = filtroVendedor === 'todos' || p.vendedor === filtroVendedor
     return coincideEstado && coincideVendedor
   })
+
+  // Lógica de paginación
+  const totalItems = presupuestosFiltrados.length
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1
+  const paginaActualValida = paginaActiva > totalPages ? 1 : paginaActiva
+
+  const indexInicio = (paginaActualValida - 1) * ITEMS_PER_PAGE
+  const indexFin = Math.min(indexInicio + ITEMS_PER_PAGE, totalItems)
+  const presupuestosPaginados = presupuestosFiltrados.slice(indexInicio, indexFin)
 
   // Renderizar la etiqueta de estado con estética rectangular outline
   const renderEstadoBadge = (status) => {
@@ -63,76 +91,82 @@ export default function Dashboard() {
     switch (p.status) {
       case 'aceptado':
         return (
-          <div className="flex items-center gap-1">
-            <button
+          <div className="flex items-center justify-end gap-1">
+            <TableActionButton
+              icon={Eye}
               title="Ver presupuesto"
-              className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 cursor-pointer rounded-none"
-            >
-              <Eye size={16} />
-            </button>
-            <button
+            />
+            <TableActionButton
+              icon={Download}
               title="Exportar PDF"
-              className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 cursor-pointer rounded-none"
-            >
-              <Download size={16} />
-            </button>
+            />
           </div>
         )
       case 'entregado':
         return (
-          <div className="flex items-center gap-1">
-            <button
+          <div className="flex items-center justify-end gap-1">
+            <TableActionButton
+              icon={Eye}
               title="Ver presupuesto"
-              className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 cursor-pointer rounded-none"
-            >
-              <Eye size={16} />
-            </button>
-            <button
+            />
+            <TableActionButton
+              icon={Pencil}
               title="Editar presupuesto"
-              className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 cursor-pointer rounded-none"
-            >
-              <Pencil size={16} />
-            </button>
+            />
           </div>
         )
       case 'vencido':
         return (
-          <div className="flex items-center gap-1">
-            <button
+          <div className="flex items-center justify-end gap-1">
+            <TableActionButton
+              icon={Eye}
               title="Ver presupuesto"
-              className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 cursor-pointer rounded-none"
-            >
-              <Eye size={16} />
-            </button>
-            <button
+            />
+            <TableActionButton
+              icon={RotateCcw}
               title="Renovar presupuesto"
-              className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 cursor-pointer rounded-none"
-            >
-              <RotateCcw size={16} />
-            </button>
+            />
           </div>
         )
       case 'borrador':
         return (
-          <div className="flex items-center gap-1">
-            <button
+          <div className="flex items-center justify-end gap-1">
+            <TableActionButton
+              icon={Pencil}
               title="Editar presupuesto"
-              className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors duration-150 cursor-pointer rounded-none"
-            >
-              <Pencil size={16} />
-            </button>
-            <button
+            />
+            <TableActionButton
+              icon={Trash2}
               title="Eliminar borrador"
-              className="p-1.5 text-error hover:bg-surface-container transition-colors duration-150 cursor-pointer rounded-none"
-            >
-              <Trash2 size={16} />
-            </button>
+              variant="danger"
+            />
           </div>
         )
       default:
         return null
     }
   }
+
+  // Configuración de las columnas para DataTable (cumple con las alineaciones de extremos e intermedias)
+  const columns = [
+    { key: 'fecha', label: 'FECHA' },
+    { key: 'cliente', label: 'CLIENTE' },
+    { key: 'total', label: 'MONTO TOTAL', mono: true },
+    { key: 'vendedor', label: 'VENDEDOR' },
+    { key: 'estado', label: 'ESTADO' },
+    { key: 'acciones', label: 'ACCIONES' },
+  ]
+
+  // Mapear presupuestos paginados a filas compatibles con DataTable
+  const dataRows = presupuestosPaginados.map((p) => ({
+    id: p.id,
+    fecha: <span className="font-mono select-all">{p.fecha}</span>,
+    cliente: <span className="font-bold leading-snug">{p.cliente}</span>,
+    total: formatARS(p.total),
+    vendedor: p.vendedor,
+    estado: renderEstadoBadge(p.status),
+    acciones: renderAcciones(p),
+  }))
 
   return (
     <div className="p-6 flex flex-col gap-4">
@@ -151,7 +185,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-3 gap-6">
         
         {/* Tarjeta 1: Total Facturado Aceptado */}
-        <div className="bg-surface-container-lowest border border-border-iron rounded-none px-5 py-4 flex flex-col gap-2">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-none px-5 py-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="label-lg text-xs text-on-surface-variant font-semibold tracking-wider uppercase">
               Total Facturado Aceptado
@@ -169,7 +203,7 @@ export default function Dashboard() {
         </div>
 
         {/* Tarjeta 2: Presupuestos Entregados */}
-        <div className="bg-surface-container-lowest border border-border-iron rounded-none px-5 py-4 flex flex-col gap-2">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-none px-5 py-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="label-lg text-xs text-on-surface-variant font-semibold tracking-wider uppercase">
               Presupuestos Entregados
@@ -185,7 +219,7 @@ export default function Dashboard() {
         </div>
 
         {/* Tarjeta 3: Presupuestos Vencidos */}
-        <div className="bg-surface-container-lowest border border-border-iron rounded-none px-5 py-4 flex flex-col gap-2">
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-none px-5 py-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="label-lg text-xs text-on-surface-variant font-semibold tracking-wider uppercase">
               Presupuestos Vencidos
@@ -205,7 +239,7 @@ export default function Dashboard() {
       </div>
 
       {/* Barra de Búsqueda y Filtros Simplificada */}
-      <div className="bg-surface-container-lowest border border-border-iron px-5 py-3.5 flex items-center gap-6 rounded-none">
+      <div className="bg-surface-container-lowest border border-outline-variant px-5 py-3.5 flex items-center gap-6 rounded-none">
         
         {/* Filtro por Estado */}
         <div className="flex items-center gap-2">
@@ -214,7 +248,7 @@ export default function Dashboard() {
           </span>
           <Select
             value={filtroEstado}
-            onChange={(e) => setFiltroEstado(e.target.value)}
+            onChange={(e) => handleFiltroEstado(e.target.value)}
             className="min-w-[160px] !py-1.5"
           >
             <option value="todos">Todos los Estados</option>
@@ -235,7 +269,7 @@ export default function Dashboard() {
           </span>
           <Select
             value={filtroVendedor}
-            onChange={(e) => setFiltroVendedor(e.target.value)}
+            onChange={(e) => handleFiltroVendedor(e.target.value)}
             className="min-w-[160px] !py-1.5"
           >
             <option value="todos">Todos</option>
@@ -247,92 +281,24 @@ export default function Dashboard() {
       </div>
 
       {/* Tabla Industrial de Presupuestos */}
-      <div className="border border-border-iron bg-surface-container-lowest rounded-none overflow-hidden flex flex-col">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-surface-container-low border-b border-border-iron">
-              <th className="px-5 py-3 label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                Fecha
-              </th>
-              <th className="px-5 py-3 label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                Cliente
-              </th>
-              <th className="px-5 py-3 label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider text-right">
-                Monto Total
-              </th>
-              <th className="px-5 py-3 label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                Vendedor
-              </th>
-              <th className="px-5 py-3 label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                Estado
-              </th>
-              <th className="px-5 py-3 label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-outline-variant">
-            {presupuestosFiltrados.length > 0 ? (
-              presupuestosFiltrados.map((p) => (
-                <tr
-                  key={p.id}
-                  className="hover:bg-surface-container-low/40 transition-colors duration-100"
-                >
-                  <td className="px-5 py-3.5 text-sm font-mono text-on-surface select-all">
-                    {p.fecha}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm font-bold text-on-surface leading-snug">
-                    {p.cliente}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm font-bold text-on-surface font-mono mono-data text-right select-all">
-                    {formatARS(p.total)}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-on-surface">
-                    {p.vendedor}
-                  </td>
-                  <td className="px-5 py-3.5">
-                    {renderEstadoBadge(p.status)}
-                  </td>
-                  <td className="px-5 py-3.5">
-                    {renderAcciones(p)}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="px-5 py-12 text-center text-sm text-on-surface-variant">
-                  No hay presupuestos que coincidan con los filtros seleccionados.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="border border-outline-variant bg-surface-container-lowest rounded-none overflow-hidden flex flex-col">
+        <DataTable
+          columns={columns}
+          rows={dataRows}
+          emptyMessage="No hay presupuestos que coincidan con los filtros seleccionados."
+        />
 
-        {/* Fila de Paginación Industrial */}
-        <div className="px-5 py-4 border-t border-border-iron bg-surface-container-low flex items-center justify-between">
-          <span className="text-xs text-on-surface-variant select-none">
-            Mostrando 1-{presupuestosFiltrados.length} de 28 presupuestos registrados
-          </span>
-          
-          {/* Botones de Paginador */}
-          <div className="flex items-center gap-1.5">
-            <button className="px-3 py-1.5 text-xs font-semibold text-on-surface bg-surface-container-lowest border border-border-iron hover:bg-surface-container-low transition-colors duration-150 cursor-pointer rounded-none select-none">
-              Anterior
-            </button>
-            <button className="px-3 py-1.5 text-xs font-bold text-white bg-primary border border-primary cursor-pointer rounded-none select-none">
-              1
-            </button>
-            <button className="px-3 py-1.5 text-xs font-semibold text-on-surface bg-surface-container-lowest border border-border-iron hover:bg-surface-container-low transition-colors duration-150 cursor-pointer rounded-none select-none">
-              2
-            </button>
-            <button className="px-3 py-1.5 text-xs font-semibold text-on-surface bg-surface-container-lowest border border-border-iron hover:bg-surface-container-low transition-colors duration-150 cursor-pointer rounded-none select-none">
-              3
-            </button>
-            <button className="px-3 py-1.5 text-xs font-semibold text-on-surface bg-surface-container-lowest border border-border-iron hover:bg-surface-container-low transition-colors duration-150 cursor-pointer rounded-none select-none">
-              Siguiente
-            </button>
-          </div>
-        </div>
+        {/* Fila de Paginación Industrial Reutilizable */}
+        {totalItems > 0 && (
+          <TablePagination
+            currentPage={paginaActualValida}
+            totalPages={totalPages}
+            onPageChange={setPaginaActiva}
+            totalItems={totalItems}
+            showingStart={indexInicio + 1}
+            showingEnd={indexFin}
+          />
+        )}
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
-import { Trash2 } from 'lucide-react';
-import DataTable from './ui/DataTable';
-import { formatARS } from '../utils/currencyFormatters';
+import { Trash2 } from 'lucide-react'
+import DataTable from './DataTable'
+import TableActionButton from './TableActionButton'
+import { formatARS } from '../../utils/currencyFormatters'
 
 // Catálogo mockeado de productos/servicios con sus precios base
 export const CATALOGO_PRODUCTOS = [
@@ -8,7 +9,7 @@ export const CATALOGO_PRODUCTOS = [
   { id: 'prod-2', nombre: 'Portón Corredizo 3x2m', precio: 450000 },
   { id: 'prod-3', nombre: 'Baranda de Balcón (ml)', precio: 85000 },
   { id: 'serv-1', nombre: 'Instalación Básica', precio: 50000 },
-];
+]
 
 export default function ProductsTable({ rows, onProductChange, onQuantityChange, onDeleteRow }) {
   // Columnas para DataTable
@@ -17,8 +18,8 @@ export default function ProductsTable({ rows, onProductChange, onQuantityChange,
     { key: 'cantidad', label: 'CANTIDAD', align: 'center' },
     { key: 'precio_unitario', label: 'PRECIO UNITARIO (ARG)', align: 'right' },
     { key: 'subtotal', label: 'SUBTOTAL', align: 'right' },
-    { key: 'acciones', label: '', align: 'center' },
-  ];
+    { key: 'acciones', label: 'ACCIONES', align: 'center' },
+  ]
 
   // Preparar filas para DataTable
   const dataTableRows = rows.map((row) => ({
@@ -56,15 +57,14 @@ export default function ProductsTable({ rows, onProductChange, onQuantityChange,
       </span>
     ),
     acciones: (
-      <button
-        onClick={() => onDeleteRow(row.id)}
-        className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container/50 transition-colors cursor-pointer"
+      <TableActionButton
+        icon={Trash2}
         title="Eliminar fila"
-      >
-        <Trash2 size={16} />
-      </button>
+        variant="danger"
+        onClick={() => onDeleteRow(row.id)}
+      />
     )
-  }));
+  }))
 
   return (
     <DataTable 
@@ -72,5 +72,5 @@ export default function ProductsTable({ rows, onProductChange, onQuantityChange,
       rows={dataTableRows} 
       emptyMessage="No hay productos en la lista."
     />
-  );
+  )
 }

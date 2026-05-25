@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Button, Card, Divider } from '../../components/ui'
+import { Button, Card } from '../../components/ui'
 import { Plus } from 'lucide-react'
-import InsumosTable from '../../components/InsumosTable'
+import { InsumosTable, TableFooterActions } from '../../components/table'
 
 // Insumos mock de base con materiales típicos de herrería
 const MOCK_INSUMOS = [
@@ -14,9 +14,11 @@ const MOCK_INSUMOS = [
 /**
  * SubvistaInsumos
  * Administra y renderiza la lista editable de materiales base e insumos.
+ * Permite guardar los costos y revertir cambios no guardados.
  */
 export default function SubvistaInsumos() {
   const [insumos, setInsumos] = useState(MOCK_INSUMOS)
+  const [insumosGuardados, setInsumosGuardados] = useState(MOCK_INSUMOS)
 
   // Agregar una nueva fila de insumo vacía
   const handleAddRow = () => {
@@ -43,9 +45,15 @@ export default function SubvistaInsumos() {
     setInsumos((prev) => prev.filter((item) => item.id !== id))
   }
 
-  // Simular el guardado de materiales en consola
+  // Guardar los materiales en memoria (estado persistido local)
   const handleSave = () => {
+    setInsumosGuardados(insumos)
     console.log('Insumos guardados en memoria del componente:', insumos)
+  }
+
+  // Descartar cambios y revertir al último estado guardado
+  const handleDiscard = () => {
+    setInsumos(insumosGuardados)
   }
 
   return (
@@ -71,13 +79,16 @@ export default function SubvistaInsumos() {
             onDeleteRow={handleDeleteRow}
           />
         </div>
-        <Divider className="my-4" />
-        <div className="flex justify-end">
-          <Button variant="primary" onClick={handleSave}>
-            Guardar Materiales
-          </Button>
-        </div>
+
+        {/* Acciones globales situadas al pie de la tabla */}
+        <TableFooterActions
+          onSave={handleSave}
+          onCancel={handleDiscard}
+          saveLabel="Guardar Materiales"
+          cancelLabel="Descartar Cambios"
+        />
       </Card>
+      
       <Card title="Productos Base (Recetas)">
         <p className="body-md text-on-surface-variant">
           El ABM de productos estándar se implementará en la próxima iteración.

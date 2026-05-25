@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Save, FileDown, Plus } from 'lucide-react'
 import { Button, Card, PageHeader, Input, Divider, Select } from '../components/ui'
-import ProductsTable, { CATALOGO_PRODUCTOS } from '../components/ProductsTable'
+import ProductsTable, { CATALOGO_PRODUCTOS } from '../components/table/ProductsTable'
 import { formatARS } from '../utils/currencyFormatters'
 
 // Vista del creador de presupuestos con secciones estructuradas y barra inferior unificada

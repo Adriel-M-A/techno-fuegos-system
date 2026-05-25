@@ -1,5 +1,6 @@
 import { Trash2 } from 'lucide-react'
-import DataTable from './ui/DataTable'
+import DataTable from './DataTable'
+import TableActionButton from './TableActionButton'
 
 // Opciones de unidades válidas para los materiales/insumos
 export const UNIDADES = [
@@ -21,7 +22,7 @@ export default function InsumosTable({ rows, onFieldChange, onDeleteRow }) {
     { key: 'material', label: 'MATERIAL' },
     { key: 'unidad', label: 'UNIDAD', align: 'center' },
     { key: 'costo', label: 'COSTO UNITARIO ($)', align: 'right' },
-    { key: 'acciones', label: '', align: 'center' },
+    { key: 'acciones', label: 'ACCIONES', align: 'center' },
   ]
 
   // Mapear cada fila a componentes interactivos compatibles con DataTable
@@ -65,13 +66,12 @@ export default function InsumosTable({ rows, onFieldChange, onDeleteRow }) {
       />
     ),
     acciones: (
-      <button
-        onClick={() => onDeleteRow(row.id)}
-        className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container/50 transition-colors cursor-pointer"
+      <TableActionButton
+        icon={Trash2}
         title="Eliminar insumo"
-      >
-        <Trash2 size={16} />
-      </button>
+        variant="danger"
+        onClick={() => onDeleteRow(row.id)}
+      />
     ),
   }))
 
