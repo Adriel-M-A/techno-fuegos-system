@@ -11,9 +11,12 @@ export default function Button({
   // Clases base comunes a todas las variantes
   const base = `
     inline-flex items-center justify-center gap-2 font-medium
-    transition-all duration-200 cursor-pointer select-none
+    transition-all duration-200 select-none
     rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-container/40 focus-visible:ring-offset-1
-    disabled:opacity-50 disabled:cursor-not-allowed disabled:-translate-y-0 disabled:shadow-none
+    ${disabled 
+      ? 'opacity-50 cursor-not-allowed -translate-y-0 shadow-none pointer-events-none' 
+      : 'cursor-pointer'
+    }
   `
 
   // Tamaños disponibles
@@ -34,6 +37,16 @@ export default function Button({
       bg-surface-container-lowest text-on-surface
       border border-outline-variant shadow-sm
       hover:bg-surface-container hover:-translate-y-[1px] hover:shadow-md
+      active:translate-y-0 active:shadow-sm
+    `,
+    tertiary: `
+      bg-tertiary-container text-on-tertiary shadow-sm
+      hover:bg-tertiary hover:shadow-md hover:-translate-y-[1px]
+      active:translate-y-0 active:shadow-sm
+    `,
+    danger: `
+      bg-error text-on-error shadow-sm
+      hover:bg-error/90 hover:shadow-md hover:-translate-y-[1px]
       active:translate-y-0 active:shadow-sm
     `,
     ghost: `

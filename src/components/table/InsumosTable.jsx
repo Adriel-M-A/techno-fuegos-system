@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react'
 import { Trash2 } from 'lucide-react'
 import DataTable from './DataTable'
 import TableActionButton from './TableActionButton'
+import { Input, Select } from '../ui'
 
 // Opciones de unidades válidas para los materiales/insumos
 export const UNIDADES = [
@@ -10,6 +12,50 @@ export const UNIDADES = [
   { value: 'kilo', label: 'Kilo' },
   { value: 'cantidad', label: 'Cantidad' },
 ]
+
+/**
+ * Componente CostoInput
+ * Maneja el estado de texto local del costo unitario para permitir la entrada fluida de decimales.
+ */
+function CostoInput({ value, onChange }) {
+  const [localText, setLocalText] = useState(() => {
+    if (value === 0 || isNaN(value) || value === undefined) return ''
+    return value.toString().replace('.', ',')
+  })
+
+  // Sincronizar remotamente solo si cambia numéricamente a nivel externo
+  useEffect(() => {
+    const parsedLocal = parseFloat(localText.replace(',', '.'))
+    const parsedVal = parseFloat(value)
+    if (parsedLocal !== parsedVal && !isNaN(parsedVal)) {
+      setLocalText(value.toString().replace('.', ','))
+    } else if (value === 0 && localText !== '') {
+      setLocalText('')
+    }
+  }, [value])
+
+  const handleChange = (e) => {
+    const text = e.target.value
+    setLocalText(text)
+    
+    const parsed = parseFloat(text.replace(',', '.'))
+    if (!isNaN(parsed)) {
+      onChange(parsed)
+    } else {
+      onChange(0)
+    }
+  }
+
+  return (
+    <Input
+      value={localText}
+      onChange={handleChange}
+      numericMode="decimal"
+      placeholder="0,00"
+      className="w-full"
+    />
+  )
+}
 
 /**
  * Componente InsumosTable
@@ -29,19 +75,20 @@ export default function InsumosTable({ rows, onFieldChange, onDeleteRow }) {
   const dataTableRows = rows.map((row) => ({
     id: row.id,
     material: (
-      <input
-        type="text"
+      <Input
         value={row.material}
         onChange={(e) => onFieldChange(row.id, 'material', e.target.value)}
-        className="w-full px-2 py-1.5 text-sm text-on-surface bg-transparent border border-transparent hover:border-border-iron focus:border-primary-container focus:bg-surface-container-lowest focus:outline-none transition-colors"
+        maxLength={50}
+        showCounter={true}
         placeholder="Ej. Caño estructural 40x40"
       />
     ),
     unidad: (
-      <select
+      <Select
         value={row.unidad}
         onChange={(e) => onFieldChange(row.id, 'unidad', e.target.value)}
-        className="w-full px-2 py-1.5 text-sm text-center text-on-surface bg-transparent border border-transparent hover:border-border-iron focus:border-primary-container focus:bg-surface-container-lowest focus:outline-none transition-colors cursor-pointer"
+        className="w-full min-w-[120px]"
+        placeholder="Unidad"
       >
         <option value="" disabled>Seleccionar unidad...</option>
         {UNIDADES.map((u) => (
@@ -49,20 +96,12 @@ export default function InsumosTable({ rows, onFieldChange, onDeleteRow }) {
             {u.label}
           </option>
         ))}
-      </select>
+      </Select>
     ),
     costo: (
-      <input
-        type="number"
-        min="0"
-        step="0.01"
+      <CostoInput
         value={row.costo}
-        onChange={(e) => {
-          const val = parseFloat(e.target.value)
-          onFieldChange(row.id, 'costo', isNaN(val) ? 0 : val)
-        }}
-        className="w-full px-2 py-1.5 text-sm text-right text-on-surface bg-transparent border border-transparent hover:border-border-iron focus:border-primary-container focus:bg-surface-container-lowest focus:outline-none transition-colors font-mono"
-        placeholder="0.00"
+        onChange={(val) => onFieldChange(row.id, 'costo', val)}
       />
     ),
     acciones: (

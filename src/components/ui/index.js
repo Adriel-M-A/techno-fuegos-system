@@ -7,4 +7,8 @@ export { default as StatusBadge } from './StatusBadge'
 export { default as Divider }     from './Divider'
 export { default as TabBar }      from './TabBar'
 export { default as Select }      from './Select'
+export { default as CharacterCounter } from './CharacterCounter'
+export { default as Textarea }         from './Textarea'
+export { default as SearchableSelect } from './SearchableSelect'
+export { default as QuantityInput }    from './QuantityInput'
 

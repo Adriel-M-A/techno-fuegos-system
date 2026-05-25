@@ -2,6 +2,7 @@ import { Trash2 } from 'lucide-react'
 import DataTable from './DataTable'
 import TableActionButton from './TableActionButton'
 import { formatARS } from '../../utils/currencyFormatters'
+import { SearchableSelect, QuantityInput } from '../ui'
 
 // Catálogo mockeado de productos/servicios con sus precios base
 export const CATALOGO_PRODUCTOS = [
@@ -21,30 +22,31 @@ export default function ProductsTable({ rows, onProductChange, onQuantityChange,
     { key: 'acciones', label: 'ACCIONES', align: 'center' },
   ]
 
+  // Formatear las opciones del catálogo para el buscador interactivo
+  const productOptions = CATALOGO_PRODUCTOS.map(p => ({
+    value: p.id,
+    label: p.nombre
+  }))
+
   // Preparar filas para DataTable
   const dataTableRows = rows.map((row) => ({
     id: row.id,
     producto: (
-      <select
+      <SearchableSelect
+        options={productOptions}
         value={row.productId}
         onChange={(e) => onProductChange(row.id, e.target.value)}
-        className="w-full px-2 py-1.5 text-sm text-on-surface bg-transparent border border-transparent hover:border-border-iron focus:border-primary-container focus:bg-surface-container-lowest focus:outline-none transition-colors cursor-pointer"
-      >
-        <option value="" disabled>Seleccionar producto...</option>
-        {CATALOGO_PRODUCTOS.map(p => (
-          <option key={p.id} value={p.id}>{p.nombre}</option>
-        ))}
-      </select>
+        placeholder="Seleccionar producto..."
+      />
     ),
     cantidad: (
-      <input
-        type="number"
-        min="1"
-        step="1"
-        value={row.quantity}
-        onChange={(e) => onQuantityChange(row.id, e.target.value)}
-        className="w-20 px-2 py-1.5 text-sm text-center text-on-surface bg-transparent border border-transparent hover:border-border-iron focus:border-primary-container focus:bg-surface-container-lowest focus:outline-none transition-colors"
-      />
+      <div className="flex justify-center">
+        <QuantityInput
+          value={row.quantity}
+          onChange={(newVal) => onQuantityChange(row.id, newVal)}
+          min={1}
+        />
+      </div>
     ),
     precio_unitario: (
       <span className="text-on-surface-variant">

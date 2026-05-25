@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Save, FileDown, Plus } from 'lucide-react'
-import { Button, Card, PageHeader, Input, Divider, Select } from '../components/ui'
+import { Button, Card, PageHeader, Input, Divider, Select, Textarea } from '../components/ui'
 import ProductsTable, { CATALOGO_PRODUCTOS } from '../components/table/ProductsTable'
 import { formatARS } from '../utils/currencyFormatters'
 
@@ -39,6 +39,7 @@ export default function Creador() {
 
   const subtotalItems = productRows.reduce((sum, row) => sum + (row.unitPrice * row.quantity), 0);
   const total = subtotalItems; // Por ahora sin modificadores
+  const isLastRowEmpty = productRows.length > 0 && productRows[productRows.length - 1].productId === '';
 
   return (
     <div className="p-6 flex flex-col gap-4">
@@ -101,6 +102,7 @@ export default function Creador() {
               variant="secondary"
               size="sm"
               onClick={handleAddProductRow}
+              disabled={isLastRowEmpty}
               className="flex items-center gap-1.5 cursor-pointer"
             >
               <Plus size={16} />
@@ -109,10 +111,13 @@ export default function Creador() {
           }
         >
           <div className="flex flex-col gap-4">
-            <Input
+            <Textarea
               label="Descripción General"
               placeholder="Ej: Fabricación e instalación de portón levadizo reforzado y rejas frontales..."
               className="w-full"
+              rows={2}
+              maxLength={250}
+              showCounter={true}
             />
             <ProductsTable
               rows={productRows}
@@ -126,8 +131,8 @@ export default function Creador() {
         {/* Sección C — Personalización y Modificaciones */}
         <Card title="Personalización y Modificaciones">
           <div className="grid grid-cols-3 gap-4">
-            <Input label="Kg extras de hierro" placeholder="0" type="number" />
-            <Input label="Horas soldadura extra" placeholder="0" type="number" />
+            <Input label="Kg extras de hierro" placeholder="0" numericMode="decimal" maxLength={6} />
+            <Input label="Horas soldadura extra" placeholder="0" numericMode="integer" maxLength={4} />
             <Input label="Herrajes especiales" placeholder="Descripción" />
           </div>
         </Card>
@@ -145,16 +150,13 @@ export default function Creador() {
               <option value="maria-gomez">María Gómez</option>
               <option value="carlos-rodriguez">Carlos Rodríguez</option>
             </Select>
-            <div className="flex flex-col gap-1">
-              <label className="label-md text-on-surface-variant uppercase tracking-wide">
-                Observaciones
-              </label>
-              <textarea
-                className="w-full px-3 py-2 text-sm text-on-surface bg-surface-container-lowest border border-outline-variant rounded-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-container/30 focus:border-primary-container resize-none"
-                rows={3}
-                placeholder="Notas internas para el PDF..."
-              />
-            </div>
+            <Textarea
+              label="Observaciones"
+              placeholder="Notas internas para el PDF..."
+              rows={3}
+              maxLength={200}
+              showCounter={true}
+            />
           </div>
         </Card>
 
@@ -183,15 +185,15 @@ export default function Creador() {
 
         {/* Acciones principales a la derecha */}
         <div className="flex items-center gap-3">
-          <Button variant="secondary" size="md">
+          <Button variant="secondary" size="md" disabled={total === 0}>
             <Save size={15} />
             Guardar Plantilla
           </Button>
-          <Button variant="secondary" size="md">
+          <Button variant="secondary" size="md" disabled={total === 0}>
             <Save size={15} />
             Guardar Borrador
           </Button>
-          <Button variant="primary" size="md">
+          <Button variant="primary" size="md" disabled={total === 0}>
             <FileDown size={15} />
             Exportar PDF
           </Button>

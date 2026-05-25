@@ -56,6 +56,8 @@ export default function SubvistaInsumos() {
     setInsumos(insumosGuardados)
   }
 
+  const hasChanges = JSON.stringify(insumos) !== JSON.stringify(insumosGuardados)
+
   return (
     <div className="flex flex-col gap-6">
       <Card
@@ -83,9 +85,10 @@ export default function SubvistaInsumos() {
         {/* Acciones globales situadas al pie de la tabla */}
         <TableFooterActions
           onSave={handleSave}
-          onCancel={handleDiscard}
+          onCancel={hasChanges ? handleDiscard : null}
           saveLabel="Guardar Materiales"
           cancelLabel="Descartar Cambios"
+          isSaveDisabled={!hasChanges}
         />
       </Card>
       
