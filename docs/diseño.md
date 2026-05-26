@@ -1,7 +1,7 @@
 # Guía de Diseño Visual e Identidad de Interfaz
 
 ## 1. Estética General e Identidad
-El sistema sigue una estética **Modern Industrial**: fusión de confiabilidad corporativa y precisión técnica. Prioriza la densidad de información, legibilidad y estructura rígida. La respuesta emocional debe ser confianza, estabilidad y precisión técnica absoluta.
+El sistema sigue una estética **Modern Industrial**: fusión de confiabilidad corporativa y precisión técnica. Prioriza la densidad de información, legibilidad y estructura limpia basada en componentes nativos de escritorio. La respuesta emocional debe ser confianza, estabilidad y precisión técnica absoluta.
 
 El sistema utiliza **modo claro únicamente**. No existe modo oscuro.
 
@@ -98,13 +98,13 @@ El sistema utiliza **modo claro únicamente**. No existe modo oscuro.
   --color-border-iron: #cbd5e1;
   --color-surface-tint: #0078d4;
 
-  /* Radios Fluent */
-  --radius-sm: 4px;      /* Botones, inputs, badges */
+  /* Radios Fluent - Unificados */
+  --radius-sm: 4px;      /* Botones, inputs, badges y selectores */
   --radius-DEFAULT: 4px;
-  --radius-md: 8px;      /* Cards, tablas de datos, modales */
+  --radius-md: 8px;      /* Tarjetas (Cards), tablas de datos y modales */
   --radius-lg: 12px;     /* Elementos flotantes o pills */
   --radius-xl: 16px;
-  --radius-full: 9999px; /* Chips e indicadores redondos */
+  --radius-full: 9999px; /* Chips e indicadores de estado redondos */
 
   /* Sombras Fluent */
   --shadow-card: 0px 1.6px 3.6px rgba(0,0,0,0.08), 0px 0.3px 0.9px rgba(0,0,0,0.04);
@@ -114,7 +114,7 @@ El sistema utiliza **modo claro únicamente**. No existe modo oscuro.
 
 ## 4. Tipografía
 
-Fuente principal: **Inter** — elegida por su legibilidad excepcional en interfaces técnicas.
+Fuente principal: **Inter** — elegida por su legibilidad excepcional en interfaces de software de escritorio.
 
 |**Estilo**|**Familia**|**Tamaño**|**Peso**|**Line Height**|**Letter Spacing**|
 |---|---|---|---|---|---|
@@ -127,23 +127,26 @@ Fuente principal: **Inter** — elegida por su legibilidad excepcional en interf
 |`label-md`|Inter|11px|500|1.2|—|
 |`mono-data`|mono|13px|400|1.4|—|
 
-- **Labels:** uppercase con letter-spacing amplio, estilo estampado industrial.
+- **Labels:** uppercase con letter-spacing amplio, estilo estampado industrial limpio.
     
-- **Datos numéricos:** siempre `font-mono` para alineación tabular de importes.
+- **Datos numéricos:** siempre `font-mono` para alineación tabular perfecta de los importes de herrería.
     
 
 ## 5. Reglas Estrictas de Componentes Visuales
 
 ### Bordes y radios (Fluent Design Windows 10/11)
 
-- **Radios de esquina:** Se implementan de forma estricta en el sistema para suavizar la interfaz:
-  - **`4px` (rounded-sm):** En botones, selectores, campos de texto (inputs) y badges rectangulares.
-  - **`8px` (rounded-md):** En tarjetas (`Cards`), contenedores principales, modales y tablas de datos.
-  - **`rounded-full`:** En badges de estado (`StatusBadge`) para simular pastillas/chips modernos.
+- **Radios de esquina:** Se implementan de forma estricta en el sistema para suavizar y modernizar la interfaz:
     
-- **Elevación y sombras:** Las tarjetas (`Cards`) y paneles elevados deben implementar sombras sutiles Fluent (`shadow-card` o `shadow-raised`) para dar profundidad a la interfaz y evitar un diseño completamente plano.
+    - **`4px` (rounded-sm):** En botones, selectores, campos de texto (inputs) y badges rectangulares.
+        
+    - **`8px` (rounded-md):** En tarjetas (`Cards`), contenedores principales, modales y tablas de datos.
+        
+    - **`rounded-full`:** En badges de estado (`StatusBadge`) para simular pastillas/chips modernos.
+        
+- **Elevación y sombras:** Las tarjetas (`Cards`) y paneles elevados deben implementar sombras sutiles Fluent (`shadow-card` o `shadow-raised`) para dar profundidad a la interfaz y evitar un diseño plano sin jerarquías.
     
-- Todos los inputs, tablas, tarjetas y contenedores deben tener un borde visible fino de `1px` usando `--color-outline-variant` para mantener la separación y estructura visual clara.
+- Todos los inputs, tablas, tarjetas y contenedores deben tener un borde visible fino de `1px` usando `--color-outline-variant` para mantener la separación y estructura visual clara del taller.
     
 
 ### Números, Precios e Importes
@@ -155,11 +158,11 @@ Fuente principal: **Inter** — elegida por su legibilidad excepcional en interf
 
 El presupuesto final se generará exclusivamente en una estética clásica, estructurada y limpia en blanco y negro (estética monocromática), maximizando el contraste para optimizar la claridad en su impresión en el taller y reduciendo al mínimo el consumo de tinta.
 
-- **Cabecera:** Nombre de la empresa, dirección, teléfono, mail, Instagram. Si un campo está vacío, la lógica condicional del frontend impide su renderizado eliminando el renglón para evitar renglones en blanco.
+- **Cabecera:** Nombre de la empresa, dirección, teléfono, mail, Instagram. Si un campo está vacío, la lógica condicional del frontend impide su renderizado eliminando el renglón para evitar espacios vacíos.
     
-- **Bloque de Contexto:** Bloque físico del campo **Descripción General** (que detalla brevemente el propósito de la cotización) posicionado en la cabecera del PDF, justo antes de la matriz numérica.
+- **Bloque de Contexto:** Bloque físico del campo **Descripción General** (que detalla brevemente el propósito de la cotización) posicionado en la cabecera del PDF, justo antes de la matriz numérica de insumos.
     
-- **Cuerpo (Desglose de Materiales):** Tabla estructurada con desglose estricto de materiales crudos utilizados (kilos de chapa, metros de perfiles, insumos específicos) y horas de mano de obra del taller estimadas, en lugar de listar productos de catálogo terminados con descripciones largas. Columnas: Cantidad, Descripción de Materiales / Servicios, Precio Unitario, Total.
+- **Cuerpo (Desglose de Materiales):** Tabla estructurada con desglose estricto de materiales crudos utilizados (kilos de chapa, metros de perfiles, insumos específicos) y horas de mano de obra del taller estimadas, en lugar de listar productos de catálogo terminados con descripciones comerciales largas. Columnas: Cantidad, Descripción de Materiales / Servicios, Precio Unitario, Total.
     
 - **Tipografía impresa:** Serif/Times para texto general y descripciones básicas, y Courier/monoespaciada para la matriz de precios alineada rigurosamente a la derecha.
     
