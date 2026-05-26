@@ -30,23 +30,23 @@ export default function Button({
   const variants = {
     primary: `
       bg-primary-container text-on-primary shadow-sm
-      hover:bg-primary hover:shadow-md hover:-translate-y-[1px]
+      hover:bg-primary hover:shadow-md hover:-translate-y-px
       active:translate-y-0 active:shadow-sm
     `,
     secondary: `
       bg-surface-container-lowest text-on-surface
       border border-outline-variant shadow-sm
-      hover:bg-surface-container hover:-translate-y-[1px] hover:shadow-md
+      hover:bg-surface-container hover:-translate-y-px hover:shadow-md
       active:translate-y-0 active:shadow-sm
     `,
     tertiary: `
       bg-tertiary-container text-on-tertiary shadow-sm
-      hover:bg-tertiary hover:shadow-md hover:-translate-y-[1px]
+      hover:bg-tertiary hover:shadow-md hover:-translate-y-px
       active:translate-y-0 active:shadow-sm
     `,
     danger: `
       bg-error text-on-error shadow-sm
-      hover:bg-error/90 hover:shadow-md hover:-translate-y-[1px]
+      hover:bg-error/90 hover:shadow-md hover:-translate-y-px
       active:translate-y-0 active:shadow-sm
     `,
     ghost: `

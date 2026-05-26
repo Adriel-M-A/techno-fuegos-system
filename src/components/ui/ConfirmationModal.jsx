@@ -61,7 +61,7 @@ export default function ConfirmationModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[1px]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       {/* Backdrop de bloqueo de interacciones traseras */}
       <div 
         className="absolute inset-0 bg-transparent" 

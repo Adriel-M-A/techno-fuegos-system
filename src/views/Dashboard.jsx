@@ -3,26 +3,20 @@ import { Plus, Send, Eye, Download, Pencil, RotateCcw, Trash2 } from 'lucide-rea
 import { Button, PageHeader, Select, StatusBadge, ConfirmationModal } from '../components/ui'
 import { DataTable, TableActionButton, TablePagination } from '../components/table'
 import { formatARS } from '../utils/currencyFormatters'
-
-// Datos mock de demostración basados en la imagen de referencia (sin ID de cliente y con estado entregado)
-const PRESUPUESTOS_MOCK = [
-  { id: 1, fecha: '2023-11-24', cliente: 'Construcciones Andes S.A.', total: 42500.00, vendedor: 'Ing. Carlos Ruiz', status: 'aceptado' },
-  { id: 2, fecha: '2023-11-22', cliente: 'Minería del Norte Ltda.', total: 128000.00, vendedor: 'Arq. Elena Soto', status: 'entregado' },
-  { id: 3, fecha: '2023-11-15', cliente: 'Inmobiliaria Horizonte', total: 12400.00, vendedor: 'Ing. Carlos Ruiz', status: 'vencido' },
-  { id: 4, fecha: '2023-11-25', cliente: 'Logística Integral S.A.', total: 5200.00, vendedor: 'Arq. Elena Soto', status: 'borrador' },
-  { id: 5, fecha: '2023-11-26', cliente: 'Metalúrgica Pilar', total: 15400.00, vendedor: 'Ing. Carlos Ruiz', status: 'aceptado' },
-  { id: 6, fecha: '2023-11-27', cliente: 'Siderurgia del Sur', total: 98000.00, vendedor: 'Arq. Elena Soto', status: 'entregado' },
-  { id: 7, fecha: '2023-11-28', cliente: 'Inversiones Patagónicas', total: 67200.00, vendedor: 'Ing. Carlos Ruiz', status: 'borrador' },
-  { id: 8, fecha: '2023-11-29', cliente: 'Distribuidora Centro', total: 31000.00, vendedor: 'Arq. Soto Elena', status: 'aceptado' },
-]
+import { MOCK_PRESUPUESTOS } from '../data'
+import useNavigationStore from '../stores/navigationStore'
 
 const ITEMS_PER_PAGE = 4
 
 /**
  * Dashboard
  * Vista del panel de control principal para seguimiento y gestión de presupuestos.
+ * Datos provistos por MOCK_PRESUPUESTOS (src/data/presupuestos.js).
+ * Todos los montos son total_centavos (INTEGER) — SAFE MONEY.
  */
 export default function Dashboard() {
+  const setVista = useNavigationStore((state) => state.setVista)
+
   const [filtroEstado, setFiltroEstado] = useState('todos')
   const [filtroVendedor, setFiltroVendedor] = useState('todos')
   const [paginaActiva, setPaginaActiva] = useState(1)
@@ -57,11 +51,11 @@ export default function Dashboard() {
   const handleRenewPresupuesto = (p) => {
     showConfirm({
       title: 'Renovar Presupuesto',
-      message: `¿Deseas renovar y recalcular el presupuesto número ${p.id} del cliente "${p.cliente}"? Se actualizará la validez y se recalcularán los importes según los costos vigentes de insumos.`,
+      message: `¿Deseas renovar y recalcular el presupuesto N° ${p.id} del cliente "${p.cliente_nombre}"? Se actualizará la validez y se recalcularán los importes según los costos vigentes de insumos.`,
       variant: 'info',
       confirmText: 'Renovar',
       onConfirm: () => {
-        console.log('Renovando presupuesto...', p.id)
+        // En prod: invoke('renovar_presupuesto', { id: p.id })
       }
     })
   }
@@ -69,11 +63,11 @@ export default function Dashboard() {
   const handleEliminarBorrador = (p) => {
     showConfirm({
       title: 'Eliminar Borrador',
-      message: `¿Estás seguro de que deseas eliminar permanentemente el borrador del presupuesto para "${p.cliente}"? Esta acción no se puede deshacer.`,
+      message: `¿Estás seguro de que deseas eliminar permanentemente el borrador del presupuesto para "${p.cliente_nombre}"? Esta acción no se puede deshacer.`,
       variant: 'danger',
       confirmText: 'Eliminar',
       onConfirm: () => {
-        console.log('Eliminando borrador...', p.id)
+        // En prod: invoke('eliminar_presupuesto', { id: p.id })
       }
     })
   }
@@ -81,16 +75,16 @@ export default function Dashboard() {
   const handleExportPDF = (p) => {
     showConfirm({
       title: 'Exportar Presupuesto',
-      message: `¿Deseas exportar y descargar el presupuesto de "${p.cliente}" en formato PDF clásico monocromático para taller?`,
+      message: `¿Deseas exportar y descargar el presupuesto de "${p.cliente_nombre}" en formato PDF monocromático para taller?`,
       variant: 'info',
       confirmText: 'Exportar PDF',
       onConfirm: () => {
-        console.log('Exportando PDF...', p.id)
+        // En prod: lógica jsPDF + jspdf-autotable
       }
     })
   }
 
-  // Cambiar filtros y resetear la página a la primera
+  // Cambiar filtros y resetear la paginación
   const handleFiltroEstado = (val) => {
     setFiltroEstado(val)
     setPaginaActiva(1)
@@ -101,84 +95,63 @@ export default function Dashboard() {
     setPaginaActiva(1)
   }
 
-  // Filtrado de presupuestos basado en las selecciones
-  const presupuestosFiltrados = PRESUPUESTOS_MOCK.filter((p) => {
-    const coincideEstado = filtroEstado === 'todos' || p.status === filtroEstado
-    const coincideVendedor = filtroVendedor === 'todos' || p.vendedor === filtroVendedor
+  // Construir lista dinámica de vendedores únicos desde el mock
+  const vendedoresUnicos = [...new Set(MOCK_PRESUPUESTOS.map(p => p.vendedor_nombre))]
+
+  // Filtrado de presupuestos
+  const presupuestosFiltrados = MOCK_PRESUPUESTOS.filter((p) => {
+    const coincideEstado = filtroEstado === 'todos' || p.estado === filtroEstado
+    const coincideVendedor = filtroVendedor === 'todos' || p.vendedor_nombre === filtroVendedor
     return coincideEstado && coincideVendedor
   })
+
+  // Métricas calculadas dinámicamente desde los mocks (centavos enteros)
+  const totalAceptadoCentavos = MOCK_PRESUPUESTOS
+    .filter(p => p.estado === 'aceptado')
+    .reduce((acc, p) => acc + p.total_centavos, 0)
+
+  const cantidadEntregados = MOCK_PRESUPUESTOS.filter(p => p.estado === 'entregado').length
+  const cantidadVencidos = MOCK_PRESUPUESTOS.filter(p => p.estado === 'vencido').length
 
   // Lógica de paginación
   const totalItems = presupuestosFiltrados.length
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1
   const paginaActualValida = paginaActiva > totalPages ? 1 : paginaActiva
-
   const indexInicio = (paginaActualValida - 1) * ITEMS_PER_PAGE
   const indexFin = Math.min(indexInicio + ITEMS_PER_PAGE, totalItems)
   const presupuestosPaginados = presupuestosFiltrados.slice(indexInicio, indexFin)
 
-  // Renderizar la etiqueta de estado usando el componente centralizado StatusBadge
-  const renderEstadoBadge = (status) => {
-    return <StatusBadge status={status} />
-  }
+  const renderEstadoBadge = (estado) => <StatusBadge status={estado} />
 
-  // Renderizar los botones de acción dinámicos en base al estado del presupuesto
+  // Renderizar botones de acción dinámicos según estado
   const renderAcciones = (p) => {
-    switch (p.status) {
+    switch (p.estado) {
       case 'aceptado':
         return (
           <div className="flex items-center justify-end gap-1">
-            <TableActionButton
-              icon={Eye}
-              title="Ver presupuesto"
-            />
-            <TableActionButton
-              icon={Download}
-              title="Exportar PDF"
-              onClick={() => handleExportPDF(p)}
-            />
+            <TableActionButton icon={Eye} title="Ver presupuesto" />
+            <TableActionButton icon={Download} title="Exportar PDF" onClick={() => handleExportPDF(p)} />
           </div>
         )
       case 'entregado':
         return (
           <div className="flex items-center justify-end gap-1">
-            <TableActionButton
-              icon={Eye}
-              title="Ver presupuesto"
-            />
-            <TableActionButton
-              icon={Pencil}
-              title="Editar presupuesto"
-            />
+            <TableActionButton icon={Eye} title="Ver presupuesto" />
+            <TableActionButton icon={Pencil} title="Editar presupuesto" />
           </div>
         )
       case 'vencido':
         return (
           <div className="flex items-center justify-end gap-1">
-            <TableActionButton
-              icon={Eye}
-              title="Ver presupuesto"
-            />
-            <TableActionButton
-              icon={RotateCcw}
-              title="Renovar presupuesto"
-              onClick={() => handleRenewPresupuesto(p)}
-            />
+            <TableActionButton icon={Eye} title="Ver presupuesto" />
+            <TableActionButton icon={RotateCcw} title="Renovar presupuesto" onClick={() => handleRenewPresupuesto(p)} />
           </div>
         )
       case 'borrador':
         return (
           <div className="flex items-center justify-end gap-1">
-            <TableActionButton
-              icon={Pencil}
-              title="Editar presupuesto"
-            />
-            <TableActionButton
-              icon={Trash2}
-              title="Eliminar borrador"
-              variant="danger"
-              onClick={() => handleEliminarBorrador(p)}
-            />
+            <TableActionButton icon={Pencil} title="Editar presupuesto" />
+            <TableActionButton icon={Trash2} title="Eliminar borrador" variant="danger" onClick={() => handleEliminarBorrador(p)} />
           </div>
         )
       default:
@@ -186,12 +159,12 @@ export default function Dashboard() {
     }
   }
 
-  // Configuración de las columnas para DataTable (cumple con las alineaciones de extremos e intermedias)
+  // Columnas de la tabla
   const columns = [
-    { key: 'fecha', label: 'FECHA' },
-    { key: 'cliente', label: 'CLIENTE' },
-    { key: 'total', label: 'MONTO TOTAL', mono: true },
-    { key: 'vendedor', label: 'VENDEDOR' },
+    { key: 'fecha_emision', label: 'FECHA' },
+    { key: 'cliente_nombre', label: 'CLIENTE' },
+    { key: 'total_centavos', label: 'MONTO TOTAL', mono: true },
+    { key: 'vendedor_nombre', label: 'VENDEDOR' },
     { key: 'estado', label: 'ESTADO' },
     { key: 'acciones', label: 'ACCIONES' },
   ]
@@ -199,11 +172,12 @@ export default function Dashboard() {
   // Mapear presupuestos paginados a filas compatibles con DataTable
   const dataRows = presupuestosPaginados.map((p) => ({
     id: p.id,
-    fecha: <span className="font-mono select-all">{p.fecha}</span>,
-    cliente: <span className="font-bold leading-snug">{p.cliente}</span>,
-    total: formatARS(p.total),
-    vendedor: p.vendedor,
-    estado: renderEstadoBadge(p.status),
+    fecha_emision: <span className="font-mono select-all">{p.fecha_emision}</span>,
+    cliente_nombre: <span className="font-bold leading-snug">{p.cliente_nombre}</span>,
+    // formatARS recibe centavos — SAFE MONEY
+    total_centavos: formatARS(p.total_centavos),
+    vendedor_nombre: p.vendedor_nombre,
+    estado: renderEstadoBadge(p.estado),
     acciones: renderAcciones(p),
   }))
 
@@ -214,35 +188,41 @@ export default function Dashboard() {
         title="Panel de Presupuestos"
         subtitle="Historial y seguimiento comercial del taller"
       >
-        <Button variant="primary" size="md" className="flex items-center gap-2 cursor-pointer">
+        <Button
+          variant="primary"
+          size="md"
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => setVista('creador')}
+        >
           <Plus size={16} />
           Nuevo Presupuesto
         </Button>
       </PageHeader>
 
-      {/* Grid de Tarjetas de Métricas Rápidas */}
+      {/* Grid de Tarjetas de Métricas Rápidas — valores calculados dinámicamente */}
       <div className="grid grid-cols-3 gap-6">
-        
-        {/* Tarjeta 1: Total Facturado Aceptado */}
-        <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-md shadow-[var(--shadow-card)] px-5 py-4 flex flex-col gap-2">
+
+        {/* Tarjeta 1: Total Aceptado */}
+        <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-md shadow-card px-5 py-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="label-lg text-xs text-on-surface-variant font-semibold tracking-wider uppercase">
               Total Facturado Aceptado
             </span>
             <span className="border border-success/30 text-success bg-success/10 px-1.5 py-0.5 text-xs font-semibold rounded-sm select-none">
-              +12%
+              Año actual
             </span>
           </div>
           <span className="text-3xl font-extrabold text-on-surface font-mono mono-data tracking-tight select-all">
-            {formatARS(1250000)}
+            {/* formatARS recibe centavos — SAFE MONEY */}
+            {formatARS(totalAceptadoCentavos)}
           </span>
           <span className="text-xs text-on-surface-variant mt-0.5">
-            Acumulado año fiscal actual
+            Suma de presupuestos aceptados
           </span>
         </div>
 
         {/* Tarjeta 2: Presupuestos Entregados */}
-        <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-md shadow-[var(--shadow-card)] px-5 py-4 flex flex-col gap-2">
+        <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-md shadow-card px-5 py-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="label-lg text-xs text-on-surface-variant font-semibold tracking-wider uppercase">
               Presupuestos Entregados
@@ -250,15 +230,15 @@ export default function Dashboard() {
             <Send className="text-primary-container" size={16} />
           </div>
           <span className="text-3xl font-extrabold text-on-surface font-mono mono-data tracking-tight select-all">
-            14
+            {cantidadEntregados}
           </span>
           <span className="text-xs text-on-surface-variant mt-0.5">
-            Pendientes de respuesta
+            Pendientes de respuesta del cliente
           </span>
         </div>
 
         {/* Tarjeta 3: Presupuestos Vencidos */}
-        <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-md shadow-[var(--shadow-card)] px-5 py-4 flex flex-col gap-2">
+        <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-md shadow-card px-5 py-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="label-lg text-xs text-on-surface-variant font-semibold tracking-wider uppercase">
               Presupuestos Vencidos
@@ -268,7 +248,7 @@ export default function Dashboard() {
             </span>
           </div>
           <span className="text-3xl font-extrabold text-on-surface font-mono mono-data tracking-tight select-all">
-            3
+            {cantidadVencidos}
           </span>
           <span className="text-xs text-on-surface-variant mt-0.5">
             Requieren seguimiento inmediato
@@ -277,9 +257,9 @@ export default function Dashboard() {
 
       </div>
 
-      {/* Barra de Búsqueda y Filtros Simplificada */}
-      <div className="bg-surface-container-lowest border border-outline-variant/60 px-5 py-3.5 flex items-center gap-6 rounded-sm shadow-[var(--shadow-card)]">
-        
+      {/* Barra de Filtros */}
+      <div className="bg-surface-container-lowest border border-outline-variant/60 px-5 py-3.5 flex items-center gap-6 rounded-sm shadow-card">
+
         {/* Filtro por Estado */}
         <div className="flex items-center gap-2">
           <span className="label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider select-none">
@@ -288,7 +268,7 @@ export default function Dashboard() {
           <Select
             value={filtroEstado}
             onChange={(e) => handleFiltroEstado(e.target.value)}
-            className="min-w-[160px] !py-1.5"
+            className="min-w-[160px]"
           >
             <option value="todos">Todos los Estados</option>
             <option value="aceptado">Aceptado</option>
@@ -298,10 +278,10 @@ export default function Dashboard() {
           </Select>
         </div>
 
-        {/* Separador vertical de filtros */}
+        {/* Separador vertical */}
         <div className="h-6 w-px bg-outline-variant/60" />
 
-        {/* Filtro por Vendedor */}
+        {/* Filtro por Vendedor — construido dinámicamente desde el mock */}
         <div className="flex items-center gap-2">
           <span className="label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider select-none">
             Vendedor:
@@ -309,11 +289,12 @@ export default function Dashboard() {
           <Select
             value={filtroVendedor}
             onChange={(e) => handleFiltroVendedor(e.target.value)}
-            className="min-w-[160px] !py-1.5"
+            className="min-w-[180px]"
           >
             <option value="todos">Todos</option>
-            <option value="Ing. Carlos Ruiz">Ing. Carlos Ruiz</option>
-            <option value="Arq. Elena Soto">Arq. Elena Soto</option>
+            {vendedoresUnicos.map(v => (
+              <option key={v} value={v}>{v}</option>
+            ))}
           </Select>
         </div>
 
@@ -327,7 +308,6 @@ export default function Dashboard() {
           emptyMessage="No hay presupuestos que coincidan con los filtros seleccionados."
         />
 
-        {/* Fila de Paginación Industrial Reutilizable */}
         {totalItems > 0 && (
           <TablePagination
             currentPage={paginaActualValida}
@@ -340,7 +320,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Modal de confirmación global para el Dashboard */}
+      {/* Modal de confirmación global */}
       <ConfirmationModal
         isOpen={modalConfig.isOpen}
         title={modalConfig.title}

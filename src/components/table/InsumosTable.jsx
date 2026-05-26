@@ -7,7 +7,7 @@ import { Input, Select, ConfirmationModal } from '../ui'
 // Opciones de unidades válidas para los materiales/insumos
 export const UNIDADES = [
   { value: 'metro', label: 'Metro' },
-  { value: 'm2', label: 'm2' },
+  { value: 'm2', label: 'm²' },
   { value: 'litro', label: 'Litro' },
   { value: 'kilo', label: 'Kilo' },
   { value: 'cantidad', label: 'Cantidad' },
@@ -15,20 +15,30 @@ export const UNIDADES = [
 
 /**
  * Componente CostoInput
- * Maneja el estado de texto local del costo unitario para permitir la entrada fluida de decimales.
+ *
+ * Maneja la conversión entre centavos enteros (SAFE MONEY) y la representación
+ * visual con coma decimal para el usuario.
+ *
+ * - Recibe: costo_centavos (INTEGER)
+ * - Muestra: pesos con coma (ej: "1.450,00" → visible en el input)
+ * - Emite: costo_centavos (INTEGER) vía onChange al guardar
  */
 function CostoInput({ value, onChange }) {
-  const [localText, setLocalText] = useState(() => {
-    if (value === 0 || isNaN(value) || value === undefined) return ''
-    return value.toString().replace('.', ',')
-  })
+  // Convertir centavos a string de pesos con coma para el display inicial
+  const centavosToDisplay = (centavos) => {
+    if (!centavos || isNaN(centavos)) return ''
+    const pesos = centavos / 100
+    return pesos.toFixed(2).replace('.', ',')
+  }
 
-  // Sincronizar remotamente solo si cambia numéricamente a nivel externo
+  const [localText, setLocalText] = useState(() => centavosToDisplay(value))
+
+  // Sincronizar remotamente si cambia externamente (ej: al descartar cambios)
   useEffect(() => {
-    const parsedLocal = parseFloat(localText.replace(',', '.'))
-    const parsedVal = parseFloat(value)
-    if (parsedLocal !== parsedVal && !isNaN(parsedVal)) {
-      setLocalText(value.toString().replace('.', ','))
+    const displayVal = centavosToDisplay(value)
+    const parsedLocal = Math.round(parseFloat(localText.replace(',', '.')) * 100)
+    if (parsedLocal !== value && !isNaN(value)) {
+      setLocalText(displayVal)
     } else if (value === 0 && localText !== '') {
       setLocalText('')
     }
@@ -37,10 +47,12 @@ function CostoInput({ value, onChange }) {
   const handleChange = (e) => {
     const text = e.target.value
     setLocalText(text)
-    
-    const parsed = parseFloat(text.replace(',', '.'))
-    if (!isNaN(parsed)) {
-      onChange(parsed)
+
+    // Convertir pesos con coma → centavos enteros para emitir
+    const pesosFloat = parseFloat(text.replace(',', '.'))
+    if (!isNaN(pesosFloat)) {
+      // Redondear para evitar errores de punto flotante antes de convertir a entero
+      onChange(Math.round(pesosFloat * 100))
     } else {
       onChange(0)
     }
@@ -59,8 +71,8 @@ function CostoInput({ value, onChange }) {
 
 /**
  * Componente InsumosTable
- * Representa una tabla CRUD interactiva para administrar la lista de insumos.
- * Todos los campos de cada fila son editables directamente.
+ * Tabla CRUD interactiva para administrar la lista de insumos.
+ * Todos los campos de costo operan con costo_centavos (INTEGER) — SAFE MONEY.
  */
 export default function InsumosTable({ rows, onFieldChange, onDeleteRow }) {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
@@ -80,7 +92,7 @@ export default function InsumosTable({ rows, onFieldChange, onDeleteRow }) {
       <Input
         value={row.material}
         onChange={(e) => onFieldChange(row.id, 'material', e.target.value)}
-        maxLength={50}
+        maxLength={100}
         showCounter={true}
         placeholder="Ej. Caño estructural 40x40"
       />
@@ -94,16 +106,15 @@ export default function InsumosTable({ rows, onFieldChange, onDeleteRow }) {
       >
         <option value="" disabled>Seleccionar unidad...</option>
         {UNIDADES.map((u) => (
-          <option key={u.value} value={u.value}>
-            {u.label}
-          </option>
+          <option key={u.value} value={u.value}>{u.label}</option>
         ))}
       </Select>
     ),
     costo: (
       <CostoInput
-        value={row.costo}
-        onChange={(val) => onFieldChange(row.id, 'costo', val)}
+        // costo_centavos: campo SAFE MONEY — INTEGER en SQLite
+        value={row.costo_centavos}
+        onChange={(centavos) => onFieldChange(row.id, 'costo_centavos', centavos)}
       />
     ),
     acciones: (
@@ -121,7 +132,7 @@ export default function InsumosTable({ rows, onFieldChange, onDeleteRow }) {
       <DataTable
         columns={columns}
         rows={dataTableRows}
-        emptyMessage="No hay insumos registrados. Añade un nuevo insumo para comenzar."
+        emptyMessage="No hay insumos registrados. Añadí un nuevo insumo para comenzar."
       />
 
       <ConfirmationModal
@@ -140,4 +151,3 @@ export default function InsumosTable({ rows, onFieldChange, onDeleteRow }) {
     </>
   )
 }
-

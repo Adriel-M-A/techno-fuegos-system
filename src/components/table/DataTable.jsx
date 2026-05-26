@@ -1,7 +1,7 @@
 // Componente DataTable: tabla de datos industrial con soporte para alineación y formato mono
 export default function DataTable({ columns = [], rows = [], emptyMessage = 'Sin datos disponibles.' }) {
   return (
-    <div className="w-full rounded-md border border-outline-variant/40 shadow-[var(--shadow-card)] bg-surface-container-lowest overflow-visible">
+    <div className="w-full rounded-md border border-outline-variant/40 shadow-card bg-surface-container-lowest overflow-visible">
       <table className="w-full border-collapse text-sm text-left">
 
         {/* Encabezado de la tabla */}

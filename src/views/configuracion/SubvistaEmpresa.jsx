@@ -1,32 +1,34 @@
 import { useState } from 'react'
 import { Button, Card, Input, Divider, Textarea, QuantityInput, ConfirmationModal } from '../../components/ui'
-
-const INITIAL_EMPRESA = {
-  nombre: 'Techno Fuegos',
-  telefono: '+54 911 0000 0000',
-  direccion: 'Pilar, Buenos Aires',
-  email: 'contacto@ejemplo.com',
-  instagram: '@technofuegos',
-  web: 'https://technofuegos.com.ar',
-}
-
-const INITIAL_PARAMETROS = {
-  validez: 30,
-  sena: 'Seña requerida del 50% para dar inicio a la fabricación en taller.',
-  inflacion: 'Los precios cotizados están sujetos a variación inflacionaria si no se efectúa la seña en 5 días.',
-}
+import { MOCK_CONFIG_EMPRESA } from '../../data'
 
 /**
  * SubvistaEmpresa
  * Renderiza y administra el formulario para editar los datos comerciales de la empresa
- * y los parámetros de validez y cláusulas del presupuesto PDF con estados controlados Fluent.
+ * y los parámetros de validez y cláusulas del presupuesto PDF.
+ *
+ * Los datos provienen de MOCK_CONFIG_EMPRESA (src/data/empresa.js).
+ * Campos: snake_case idénticos al struct ConfigEmpresa de Rust / tabla config_empresa de SQLite.
  */
 export default function SubvistaEmpresa() {
-  const [empresa, setEmpresa] = useState(INITIAL_EMPRESA)
-  const [empresaGuardada, setEmpresaGuardada] = useState(INITIAL_EMPRESA)
+  // Estado separado por sección para detección de cambios granular
+  // (en prod: se reemplaza el estado inicial por invoke('obtener_config_empresa'))
+  const [empresa, setEmpresa] = useState({
+    nombre: MOCK_CONFIG_EMPRESA.nombre,
+    telefono: MOCK_CONFIG_EMPRESA.telefono,
+    direccion: MOCK_CONFIG_EMPRESA.direccion,
+    email: MOCK_CONFIG_EMPRESA.email,
+    instagram: MOCK_CONFIG_EMPRESA.instagram,
+    web: MOCK_CONFIG_EMPRESA.web,
+  })
+  const [empresaGuardada, setEmpresaGuardada] = useState({ ...empresa })
 
-  const [parametros, setParametros] = useState(INITIAL_PARAMETROS)
-  const [parametrosGuardados, setParametrosGuardados] = useState(INITIAL_PARAMETROS)
+  const [parametros, setParametros] = useState({
+    validez_dias: MOCK_CONFIG_EMPRESA.validez_dias,
+    clausula_sena: MOCK_CONFIG_EMPRESA.clausula_sena,
+    clausula_inflacion: MOCK_CONFIG_EMPRESA.clausula_inflacion,
+  })
+  const [parametrosGuardados, setParametrosGuardados] = useState({ ...parametros })
 
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
@@ -66,8 +68,8 @@ export default function SubvistaEmpresa() {
       variant: 'success',
       confirmText: 'Guardar',
       onConfirm: () => {
+        // En prod: invoke('guardar_config_empresa', { empresa })
         setEmpresaGuardada(empresa)
-        console.log('Datos comerciales guardados en memoria:', empresa)
       }
     })
   }
@@ -91,8 +93,8 @@ export default function SubvistaEmpresa() {
       variant: 'success',
       confirmText: 'Guardar',
       onConfirm: () => {
+        // En prod: invoke('guardar_config_empresa', { parametros })
         setParametrosGuardados(parametros)
-        console.log('Parámetros PDF guardados en memoria:', parametros)
       }
     })
   }
@@ -109,59 +111,58 @@ export default function SubvistaEmpresa() {
     })
   }
 
-  const handleFieldChangeEmpresa = (field, val) => {
+  const handleFieldEmpresa = (field, val) => {
     setEmpresa(prev => ({ ...prev, [field]: val }))
   }
 
-  const handleFieldChangeParametros = (field, val) => {
+  const handleFieldParametros = (field, val) => {
     setParametros(prev => ({ ...prev, [field]: val }))
   }
 
   return (
-
     <div className="flex flex-col gap-6">
-      
+
       {/* Datos Comerciales */}
       <Card title="Datos de la Empresa">
         <div className="grid grid-cols-2 gap-4">
-          <Input 
-            label="Nombre de la empresa" 
-            placeholder="Techno Fuegos" 
-            value={empresa.nombre} 
-            onChange={(e) => handleFieldChangeEmpresa('nombre', e.target.value)} 
+          <Input
+            label="Nombre de la empresa"
+            placeholder="Techno Fuegos"
+            value={empresa.nombre}
+            onChange={(e) => handleFieldEmpresa('nombre', e.target.value)}
           />
-          <Input 
-            label="Teléfono" 
-            placeholder="+54 911 0000 0000" 
-            type="tel" 
-            value={empresa.telefono} 
-            onChange={(e) => handleFieldChangeEmpresa('telefono', e.target.value)} 
+          <Input
+            label="Teléfono"
+            placeholder="+54 911 0000 0000"
+            type="tel"
+            value={empresa.telefono}
+            onChange={(e) => handleFieldEmpresa('telefono', e.target.value)}
           />
-          <Input 
-            label="Dirección" 
-            placeholder="Pilar, Buenos Aires" 
-            value={empresa.direccion} 
-            onChange={(e) => handleFieldChangeEmpresa('direccion', e.target.value)} 
+          <Input
+            label="Dirección"
+            placeholder="Pilar, Buenos Aires"
+            value={empresa.direccion}
+            onChange={(e) => handleFieldEmpresa('direccion', e.target.value)}
           />
-          <Input 
-            label="Correo electrónico" 
-            placeholder="contacto@ejemplo.com" 
-            type="email" 
-            value={empresa.email} 
-            onChange={(e) => handleFieldChangeEmpresa('email', e.target.value)} 
+          <Input
+            label="Correo electrónico"
+            placeholder="contacto@ejemplo.com"
+            type="email"
+            value={empresa.email}
+            onChange={(e) => handleFieldEmpresa('email', e.target.value)}
           />
-          <Input 
-            label="Instagram" 
-            placeholder="@technofuegos" 
-            value={empresa.instagram} 
-            onChange={(e) => handleFieldChangeEmpresa('instagram', e.target.value)} 
+          <Input
+            label="Instagram"
+            placeholder="@technofuegos"
+            value={empresa.instagram}
+            onChange={(e) => handleFieldEmpresa('instagram', e.target.value)}
           />
-          <Input 
-            label="Sitio web" 
-            placeholder="https://..." 
-            type="url" 
-            value={empresa.web} 
-            onChange={(e) => handleFieldChangeEmpresa('web', e.target.value)} 
+          <Input
+            label="Sitio web"
+            placeholder="https://..."
+            type="url"
+            value={empresa.web}
+            onChange={(e) => handleFieldEmpresa('web', e.target.value)}
           />
         </div>
         <Divider className="my-4" />
@@ -180,21 +181,21 @@ export default function SubvistaEmpresa() {
       {/* Parámetros del Reporte PDF */}
       <Card title="Parámetros del Presupuesto PDF">
         <div className="grid grid-cols-2 gap-4">
-          {/* Validez en días con QuantityInput interactivo */}
+          {/* Validez en días */}
           <div className="flex flex-col gap-1.5 w-full">
             <span className="label-md text-on-surface-variant uppercase tracking-wide select-none">
               Validez del presupuesto (días)
             </span>
             <QuantityInput
-              value={parametros.validez}
-              onChange={(val) => handleFieldChangeParametros('validez', val)}
+              value={parametros.validez_dias}
+              onChange={(val) => handleFieldParametros('validez_dias', val)}
               min={1}
               max={365}
               className="w-32"
             />
           </div>
           <div />
-          
+
           <Textarea
             label="Cláusula de Seña"
             placeholder="Texto que aparecerá en el pie del presupuesto PDF..."
@@ -202,8 +203,8 @@ export default function SubvistaEmpresa() {
             maxLength={300}
             showCounter={true}
             className="col-span-2"
-            value={parametros.sena}
-            onChange={(e) => handleFieldChangeParametros('sena', e.target.value)}
+            value={parametros.clausula_sena}
+            onChange={(e) => handleFieldParametros('clausula_sena', e.target.value)}
           />
           <Textarea
             label="Cláusula de Inflación"
@@ -212,8 +213,8 @@ export default function SubvistaEmpresa() {
             maxLength={300}
             showCounter={true}
             className="col-span-2"
-            value={parametros.inflacion}
-            onChange={(e) => handleFieldChangeParametros('inflacion', e.target.value)}
+            value={parametros.clausula_inflacion}
+            onChange={(e) => handleFieldParametros('clausula_inflacion', e.target.value)}
           />
         </div>
         <Divider className="my-4" />
@@ -228,8 +229,8 @@ export default function SubvistaEmpresa() {
           </Button>
         </div>
       </Card>
-      
-      {/* Modal de confirmación global para empresa y parámetros */}
+
+      {/* Modal de confirmación global */}
       <ConfirmationModal
         isOpen={modalConfig.isOpen}
         title={modalConfig.title}

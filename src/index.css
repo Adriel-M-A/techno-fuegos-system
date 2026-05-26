@@ -51,14 +51,17 @@
   --color-border-iron: #cbd5e1;
   --color-surface-tint: #0078d4;
 
-  /* Variables personalizadas para efectos */
+  /* Colores del sidebar (mapeados como bg-sidebar-bg, bg-sidebar-active, etc.) */
   --color-sidebar-bg: #eef3fb; /* Fondo Mica para sidebar */
-  --color-sidebar-active: #dbeafe; /* Item activo */
+  --color-sidebar-active: #dbeafe; /* Ítem activo seleccionado */
 
-  /* Sombras Fluent suaves */
+  /* Sombras Fluent — mapeadas como shadow-card, shadow-raised, shadow-overlay */
   --shadow-card: 0px 1.6px 3.6px rgba(0, 0, 0, 0.08), 0px 0.3px 0.9px rgba(0, 0, 0, 0.04);
   --shadow-raised: 0px 8px 16px rgba(0, 0, 0, 0.08), 0px 1px 3px rgba(0, 0, 0, 0.04);
   --shadow-overlay: 0px 32px 64px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.06);
+
+  /* Blur para overlay de modales — mapeado como blur-overlay */
+  --blur-overlay: 1px;
 
   /* Radios Fluent */
   --radius-sm: 4px; /* Botones, Inputs, Badges */
@@ -216,8 +219,9 @@
 }
 
 body {
-  background-color: #f7f9fb;
-  color: #191c1e;
+  /* Usar tokens semánticos en lugar de colores hardcodeados */
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
   font-family: "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LayoutGrid, PlusCircle, Settings, HelpCircle, Menu } from 'lucide-react'
+import { LayoutGrid, PlusCircle, Settings, LifeBuoy, Menu } from 'lucide-react'
 import SidebarButton from './SidebarButton'
 
 // Listado de ítems de navegación parametrizados de acuerdo con la guía de diseño
@@ -7,7 +7,7 @@ const NAV_ITEMS = [
   { label: 'Dashboard', icon: LayoutGrid, vista: 'presupuestos' },
   { label: 'Creador', icon: PlusCircle, vista: 'creador' },
   { label: 'Configuración', icon: Settings, vista: 'costos' },
-  { label: 'Centro de Ayuda', icon: HelpCircle, vista: 'manual' },
+  { label: 'Centro de Ayuda', icon: LifeBuoy, vista: 'manual' },
 ]
 
 // Componente Sidebar principal con soporte de panel colapsable Fluent
@@ -17,7 +17,7 @@ export default function Sidebar() {
   return (
     <aside
       className={`
-        h-screen flex flex-col bg-[var(--color-sidebar-bg)] border-r border-outline-variant/40 shrink-0
+        h-screen flex flex-col bg-sidebar-bg border-r border-outline-variant/40 shrink-0
         transition-all duration-300 ease-in-out
         ${isCollapsed ? 'w-16 px-1' : 'w-60 px-2'}
       `}

@@ -214,9 +214,9 @@ export default function Select({
                       px-3 py-1.5 text-xs cursor-pointer transition-colors duration-150 select-none text-left
                       ${opt.disabled ? 'text-on-surface-variant/30 cursor-not-allowed' : ''}
                       ${isSelected && !opt.disabled
-                        ? 'bg-[var(--color-sidebar-active)] text-primary-container font-semibold'
+                        ? 'bg-sidebar-active text-primary-container font-semibold'
                         : isHighlighted && !opt.disabled
-                          ? 'bg-primary-container/8 text-primary-container font-medium'
+                          ? 'bg-primary-container/10 text-primary-container font-medium'
                           : opt.disabled
                             ? ''
                             : 'text-on-surface hover:bg-primary-container/5 hover:text-primary-container'

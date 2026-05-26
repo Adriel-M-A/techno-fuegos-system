@@ -2,22 +2,16 @@ import { useState } from 'react'
 import { Button, Card, ConfirmationModal } from '../../components/ui'
 import { Plus } from 'lucide-react'
 import { InsumosTable, TableFooterActions } from '../../components/table'
-
-
-// Insumos mock de base con materiales típicos de herrería
-const MOCK_INSUMOS = [
-  { id: '1', material: 'Chapa de hierro dulce (1.2mm)', unidad: 'kilo', costo: 1450.00 },
-  { id: '2', material: 'Caño estructural 40x40x1.6mm', unidad: 'metro', costo: 2800.00 },
-  { id: '3', material: 'Pintura antióxido negro', unidad: 'litro', costo: 5400.00 },
-  { id: '4', material: 'Electrodo punta azul 2.5mm', unidad: 'cantidad', costo: 85.00 },
-]
+import { MOCK_INSUMOS } from '../../data'
 
 /**
  * SubvistaInsumos
  * Administra y renderiza la lista editable de materiales base e insumos.
- * Permite guardar los costos y revertir cambios no guardados.
+ * Los datos provienen del mock centralizado MOCK_INSUMOS (src/data/insumos.js).
+ * Todos los costos operan con costo_centavos (INTEGER) — SAFE MONEY.
  */
 export default function SubvistaInsumos() {
+  // Carga inicial desde el mock centralizado (en prod: se reemplaza por invoke('listar_insumos'))
   const [insumos, setInsumos] = useState(MOCK_INSUMOS)
   const [insumosGuardados, setInsumosGuardados] = useState(MOCK_INSUMOS)
 
@@ -48,7 +42,7 @@ export default function SubvistaInsumos() {
     setModalConfig(prev => ({ ...prev, isOpen: false }))
   }
 
-  // Agregar una nueva fila de insumo vacía
+  // Agregar una nueva fila de insumo vacía con costo_centavos = 0
   const handleAddRow = () => {
     setInsumos((prev) => [
       ...prev,
@@ -56,7 +50,7 @@ export default function SubvistaInsumos() {
         id: crypto.randomUUID(),
         material: '',
         unidad: 'metro',
-        costo: 0,
+        costo_centavos: 0,          // SAFE MONEY: centavos enteros
       },
     ])
   }
@@ -73,7 +67,7 @@ export default function SubvistaInsumos() {
     setInsumos((prev) => prev.filter((item) => item.id !== id))
   }
 
-  // Guardar los materiales en memoria (estado persistido local)
+  // Guardar los materiales en memoria (en prod: se reemplaza por invoke('guardar_insumos'))
   const handleSave = () => {
     showConfirm({
       title: 'Guardar Materiales',
@@ -82,7 +76,6 @@ export default function SubvistaInsumos() {
       confirmText: 'Guardar',
       onConfirm: () => {
         setInsumosGuardados(insumos)
-        console.log('Insumos guardados en memoria del componente:', insumos)
       }
     })
   }
@@ -102,6 +95,9 @@ export default function SubvistaInsumos() {
 
   const hasChanges = JSON.stringify(insumos) !== JSON.stringify(insumosGuardados)
 
+  // Deshabilitar "Añadir Fila" si la última fila tiene el campo material vacío
+  const isLastRowEmpty = insumos.length > 0 && insumos[insumos.length - 1].material.trim() === ''
+
   return (
     <div className="flex flex-col gap-6">
       <Card
@@ -111,6 +107,7 @@ export default function SubvistaInsumos() {
             variant="secondary"
             size="sm"
             onClick={handleAddRow}
+            disabled={isLastRowEmpty}
             className="flex items-center gap-1.5 cursor-pointer"
           >
             <Plus size={16} />
@@ -126,7 +123,7 @@ export default function SubvistaInsumos() {
           />
         </div>
 
-        {/* Acciones globales situadas al pie de la tabla */}
+        {/* Acciones globales al pie de la tabla */}
         <TableFooterActions
           onSave={handleSave}
           onCancel={hasChanges ? handleDiscard : null}
@@ -135,7 +132,7 @@ export default function SubvistaInsumos() {
           isSaveDisabled={!hasChanges}
         />
       </Card>
-      
+
       <Card title="Productos Base (Recetas)">
         <p className="body-md text-on-surface-variant">
           El ABM de productos estándar se implementará en la próxima iteración.
