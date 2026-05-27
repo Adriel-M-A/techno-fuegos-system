@@ -72,3 +72,28 @@ Antes de cualquier tarea de análisis o implementación, leer siempre estos arch
 - **docs/diseño.md** — Guía de diseño visual, paleta de colores, tipografía, configuración de Tailwind v4 y restricciones de componentes.
 
 Estos archivos son la fuente de verdad del proyecto. Ninguna decisión de diseño o arquitectura debe contradecirlos.
+
+## 7. Estrategia de Carga y Búsqueda de Datos (Tablas y Formularios)
+El sistema opera en un entorno de escritorio nativo 100% offline (Tauri + SQLite) con un catálogo acotado de insumos y servicios (entre 200 y 1.000 registros base). Por lo tanto, la optimización de datos se rige bajo las siguientes directrices operativas estrictas:
+
+- **Carga Única en Memoria:** Al montar o inicializar formularios de alta densidad (como el Creador de Presupuestos), el estado global (Zustand) debe solicitar el array completo de insumos mediante un único comando IPC (`invoke`) hacia el backend de Rust.
+- **Filtrado Reactivo e Inmediato:** Está terminantemente prohibido implementar umbrales mínimos de caracteres (como esperar a que el usuario escriba 3 letras) para activar las búsquedas en los selectores dinámicos. El filtrado se realiza puramente en el frontend con JavaScript mediante `.filter()` sobre el array local en caliente, respondiendo instantáneamente desde el primer carácter introducido.
+- **Aislamiento de la Base de Datos:** No se deben emitir consultas continuas de búsqueda (`LIKE %búsqueda%`) hacia el archivo de SQLite por cada tecla presionada en las grillas o filas adaptables. Esto evita problemas de concurrencia local y micropausas en la interfaz del taller.
+- **Sincronización por Eventos:** La actualización del listado local en memoria solo se re-ejecuta si el administrativo añade, modifica o elimina un insumo maestro desde el panel de configuración y navega de regreso al creador.
+
+## 8. Comportamiento, Rendimiento y UX en Grillas de Datos (Tablas)
+Para garantizar un renderizado instantáneo y evitar problemas de bloqueo de interfaz (input lag) en el entorno de escritorio, la construcción de tablas se divide en dos patrones arquitectónicos estrictos según su propósito operativo:
+
+### Patrón A: Tablas Dinámicas Operativas (Carga y Cálculo en Caliente)
+Se aplican en formularios de creación o edición de documentos de alta densidad donde el cálculo numérico ocurre en tiempo real (ej: desgloses de ítems, cálculo de presupuestos).
+- **Crecimiento Elástico:** Comienzan vacías o con una única fila y crecen verticalmente a medida que el operario añade registros dinámicos.
+- **Sin Paginación:** El volumen de filas por documento es acotado por naturaleza de negocio. Dividir estas tablas en páginas destruye la experiencia de usuario, ya que el administrativo requiere controlar los totales y modificadores de un solo golpe de vista.
+- **Scroll Contenedor Estricto:** La tarjeta o panel contenedor debe poseer un límite de altura rígido gestionado mediante las variables del tema de Tailwind v4 y scroll interno (`overflow-y-auto`) enfocado en el cuerpo (`<tbody>`), manteniendo siempre fijos los encabezados de las columnas para no perder la referencia visual.
+
+### Patrón B: Tablas Maestras de Administración (Catálogos y ABM)
+Se aplican en pantallas de configuración, visualización de historiales o administración de entidades base del sistema (ej: gestión de materiales, listas de clientes, control de empleados).
+- **Grillas de Solo Lectura:** Está terminantemente prohibido inyectar inputs editables de forma directa dentro de las celdas de la tabla para modificar registros masivos. Las filas solo renderizan texto plano o componentes de visualización limpios, optimizando al 100% los ciclos de re-renderizado de React.
+- **Flujo Operativo Basado en Modales:** Las acciones de creación o edición de una fila se aíslan por completo mediante un modal de formulario dedicado que hereda la identidad visual industrial (radios `rounded-md` para el contenedor y `rounded-sm` para los campos).
+- **Paginación en Memoria (Frontend):** El array completo de registros (obtenido en un único viaje IPC desde SQLite al montar la vista madre) se segmenta localmente en bloques fijos de 20 o 25 filas utilizando el componente de paginación combinado con el método `.slice()` de JavaScript.
+- **Inserción y Redirección:** Al confirmar un alta exitosa desde el modal, el nuevo objeto se añade al inicio del array principal en memoria (`unshift`) y el sistema debe forzar de manera automática el redireccionamiento del paginador hacia la Página 1 para ofrecer feedback visual inmediato.
+- **Bloqueo Preventivo de Navegación:** Si existen modificaciones locales pendientes en el estado de la vista que no han sido impactadas en la base de datos de SQLite, el paginador debe inhabilitar los clics de cambio de página o disparar el modal de confirmación para evitar la pérdida accidental de datos antes de presionar la persistencia masiva en el pie de la pantalla.

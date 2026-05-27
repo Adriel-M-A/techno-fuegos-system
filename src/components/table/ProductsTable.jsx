@@ -12,7 +12,7 @@ export default function ProductsTable({ rows, onProductChange, onQuantityChange,
     { key: 'cantidad', label: 'CANTIDAD', align: 'center' },
     { key: 'precio_unitario', label: 'PRECIO UNITARIO', align: 'right' },
     { key: 'subtotal', label: 'SUBTOTAL', align: 'right' },
-    { key: 'acciones', label: 'ACCIONES', align: 'center' },
+    { key: 'acciones', label: 'ACCIONES', align: 'right' },
   ]
 
   // Opciones del catálogo para el selector interactivo
@@ -54,12 +54,14 @@ export default function ProductsTable({ rows, onProductChange, onQuantityChange,
       </span>
     ),
     acciones: (
-      <TableActionButton
-        icon={Trash2}
-        title="Eliminar fila"
-        variant="danger"
-        onClick={() => onDeleteRow(row.id)}
-      />
+      <div className="flex justify-end">
+        <TableActionButton
+          icon={Trash2}
+          title="Eliminar fila"
+          variant="danger"
+          onClick={() => onDeleteRow(row.id)}
+        />
+      </div>
     ),
   }))
 

@@ -12,4 +12,6 @@ export { default as Textarea }         from './Textarea'
 export { default as SearchableSelect } from './SearchableSelect'
 export { default as QuantityInput }    from './QuantityInput'
 export { default as ConfirmationModal } from './ConfirmationModal'
+export { default as InsumoFormModal } from './InsumoFormModal'
+export { default as TemplateFormModal } from './TemplateFormModal'
 

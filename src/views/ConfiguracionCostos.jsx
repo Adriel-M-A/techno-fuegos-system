@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { PageHeader, TabBar } from '../components/ui'
 import SubvistaInsumos from './configuracion/SubvistaInsumos'
+import SubvistaPlantillas from './configuracion/SubvistaPlantillas'
 import SubvistaEmpresa from './configuracion/SubvistaEmpresa'
 import SubvistaEmpleados from './configuracion/SubvistaEmpleados'
 import SubvistaSoporte from './configuracion/SubvistaSoporte'
 
-// Tabs de configuración según el PRD (Insumos, Empresa y PDF, Empleados, Soporte)
+// Tabs de configuración según el PRD (Insumos, Plantillas, Empresa y PDF, Empleados, Soporte)
 const TABS = [
   { id: 'insumos', label: 'Insumos y Recetas' },
+  { id: 'plantillas', label: 'Plantillas de Presupuesto' },
   { id: 'empresa', label: 'Empresa y PDF' },
   { id: 'empleados', label: 'Empleados' },
   { id: 'soporte', label: 'Soporte y Mantenimiento' },
@@ -25,6 +27,7 @@ export default function ConfiguracionCostos() {
       />
       <TabBar tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
       {activeTab === 'insumos' && <SubvistaInsumos />}
+      {activeTab === 'plantillas' && <SubvistaPlantillas />}
       {activeTab === 'empresa' && <SubvistaEmpresa />}
       {activeTab === 'empleados' && <SubvistaEmpleados />}
       {activeTab === 'soporte' && <SubvistaSoporte />}

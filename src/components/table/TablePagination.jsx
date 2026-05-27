@@ -6,6 +6,7 @@ export default function TablePagination({
   totalItems = 0,
   showingStart = 0,
   showingEnd = 0,
+  itemType = 'presupuestos',
 }) {
   // Generar la lista de números de páginas
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -16,7 +17,7 @@ export default function TablePagination({
       <span className="text-xs text-on-surface-variant font-medium select-none">
         Mostrando <span className="font-mono">{showingStart}</span>-
         <span className="font-mono">{showingEnd}</span> de{' '}
-        <span className="font-mono">{totalItems}</span> presupuestos registrados
+        <span className="font-mono">{totalItems}</span> {itemType} registrados
       </span>
 
       {/* Botones del paginador a la derecha */}

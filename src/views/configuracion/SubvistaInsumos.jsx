@@ -1,20 +1,34 @@
 import { useState } from 'react'
-import { Button, Card, ConfirmationModal } from '../../components/ui'
-import { Plus } from 'lucide-react'
-import { InsumosTable, TableFooterActions } from '../../components/table'
+import { Button, Card, ConfirmationModal, InsumoFormModal, Input, Select } from '../../components/ui'
+import { Plus, Search } from 'lucide-react'
+import { InsumosTable } from '../../components/table'
+import TablePagination from '../../components/table/TablePagination'
 import { MOCK_INSUMOS } from '../../data'
+import { CATEGORIAS_INSUMOS } from '../../components/ui/InsumoFormModal'
 
 /**
  * SubvistaInsumos
- * Administra y renderiza la lista editable de materiales base e insumos.
- * Los datos provienen del mock centralizado MOCK_INSUMOS (src/data/insumos.js).
+ * Administra y renderiza la lista de materiales base e insumos.
+ * Flujo moderno basado en modales para alta y edición, con filtrado en tiempo real y paginación de 20 en 20.
  * Todos los costos operan con costo_centavos (INTEGER) — SAFE MONEY.
  */
 export default function SubvistaInsumos() {
-  // Carga inicial desde el mock centralizado (en prod: se reemplaza por invoke('listar_insumos'))
+  // Carga inicial de insumos desde el mock centralizado
   const [insumos, setInsumos] = useState(MOCK_INSUMOS)
-  const [insumosGuardados, setInsumosGuardados] = useState(MOCK_INSUMOS)
 
+  // Estados de filtrado reactivo
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('')
+
+  // Estados de paginación
+  const [currentPage, setCurrentPage] = useState(1)
+  const ITEMS_PER_PAGE = 20
+
+  // Estados del modal de formulario
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [activeInsumo, setActiveInsumo] = useState(null)
+
+  // Estados para diálogos de confirmación global
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     title: '',
@@ -42,61 +56,66 @@ export default function SubvistaInsumos() {
     setModalConfig(prev => ({ ...prev, isOpen: false }))
   }
 
-  // Agregar una nueva fila de insumo vacía con costo_centavos = 0
-  const handleAddRow = () => {
-    setInsumos((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        material: '',
-        unidad: 'metro',
-        costo_centavos: 0,          // SAFE MONEY: centavos enteros
-      },
-    ])
+  // --- Lógica del modal de formulario ---
+
+  // Abrir modal en modo "Creación"
+  const handleOpenCreateModal = () => {
+    setActiveInsumo(null)
+    setIsFormOpen(true)
   }
 
-  // Modificar un campo específico de una fila por su ID
-  const handleFieldChange = (id, field, value) => {
-    setInsumos((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-    )
+  // Abrir modal en modo "Edición" al recibir la fila
+  const handleOpenEditModal = (insumo) => {
+    setActiveInsumo(insumo)
+    setIsFormOpen(true)
   }
 
-  // Eliminar un insumo de la lista
+  // Confirmar y guardar el insumo (creación o edición)
+  const handleSaveInsumo = (insumoData) => {
+    if (activeInsumo) {
+      // Modo Edición: mapear y actualizar
+      setInsumos(prev => prev.map(item => item.id === insumoData.id ? insumoData : item))
+    } else {
+      // Modo Creación: insertar al principio, limpiar filtros para verlo, y redirigir a la página 1
+      setInsumos(prev => [insumoData, ...prev])
+      setSearchQuery('')
+      setSelectedCategory('')
+      setCurrentPage(1)
+    }
+    setIsFormOpen(false)
+    setActiveInsumo(null)
+  }
+
+  // Eliminar un insumo de la lista local
   const handleDeleteRow = (id) => {
-    setInsumos((prev) => prev.filter((item) => item.id !== id))
+    setInsumos(prev => prev.filter(item => item.id !== id))
+    
+    // Si la página se queda vacía después de eliminar, retroceder una página
+    const newTotalItems = insumos.length - 1
+    const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE) || 1
+    if (currentPage > newTotalPages) {
+      setCurrentPage(newTotalPages)
+    }
   }
 
-  // Guardar los materiales en memoria (en prod: se reemplaza por invoke('guardar_insumos'))
-  const handleSave = () => {
-    showConfirm({
-      title: 'Guardar Materiales',
-      message: '¿Deseas guardar los costos de insumos y materiales actuales? Estos se aplicarán en todos los nuevos presupuestos creados.',
-      variant: 'success',
-      confirmText: 'Guardar',
-      onConfirm: () => {
-        setInsumosGuardados(insumos)
-      }
-    })
-  }
+  // --- Filtrado en memoria (Reactivo e instantáneo) ---
+  const insumosFiltrados = insumos.filter(item => {
+    const matchesSearch = item.material.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = !selectedCategory || item.categoria === selectedCategory
+    return matchesSearch && matchesCategory
+  })
 
-  // Descartar cambios y revertir al último estado guardado
-  const handleDiscard = () => {
-    showConfirm({
-      title: 'Descartar Cambios',
-      message: '¿Estás seguro de que deseas revertir todos los cambios realizados? Se perderán las modificaciones no guardadas.',
-      variant: 'warning',
-      confirmText: 'Descartar',
-      onConfirm: () => {
-        setInsumos(insumosGuardados)
-      }
-    })
-  }
+  // --- Cálculos de paginación ---
+  const totalItems = insumosFiltrados.length
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1
 
-  const hasChanges = JSON.stringify(insumos) !== JSON.stringify(insumosGuardados)
+  // Asegurar que la página actual esté en rango
+  const validPage = Math.min(currentPage, totalPages)
+  const showingStart = totalItems === 0 ? 0 : (validPage - 1) * ITEMS_PER_PAGE + 1
+  const showingEnd = Math.min(validPage * ITEMS_PER_PAGE, totalItems)
 
-  // Deshabilitar "Añadir Fila" si la última fila tiene el campo material vacío
-  const isLastRowEmpty = insumos.length > 0 && insumos[insumos.length - 1].material.trim() === ''
+  // Array rebanado para mostrar en la grilla
+  const insumosPaginados = insumosFiltrados.slice((validPage - 1) * ITEMS_PER_PAGE, validPage * ITEMS_PER_PAGE)
 
   return (
     <div className="flex flex-col gap-6">
@@ -106,31 +125,68 @@ export default function SubvistaInsumos() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={handleAddRow}
-            disabled={isLastRowEmpty}
+            onClick={handleOpenCreateModal}
             className="flex items-center gap-1.5 cursor-pointer"
           >
             <Plus size={16} />
-            Añadir Fila
+            Añadir Insumo
           </Button>
         }
       >
+        {/* Barra de Filtros y Búsqueda (Modern Industrial / Fluent) */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-4 p-3 bg-surface-container-low/40 border border-outline-variant/40 rounded-sm">
+          {/* Input de búsqueda por texto */}
+          <div className="flex-1 relative">
+            <Input
+              placeholder="Buscar material o insumo..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                setCurrentPage(1)
+              }}
+              className="w-full"
+            />
+          </div>
+
+          {/* Selector de categorías */}
+          <div className="w-full sm:w-64">
+            <Select
+              value={selectedCategory}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value)
+                setCurrentPage(1)
+              }}
+              className="w-full"
+            >
+              <option value="">Todas las categorías</option>
+              {CATEGORIAS_INSUMOS.map((c) => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </Select>
+          </div>
+        </div>
+
+        {/* Grilla interactiva */}
         <div className="overflow-x-auto">
           <InsumosTable
-            rows={insumos}
-            onFieldChange={handleFieldChange}
+            rows={insumosPaginados}
+            onEditRow={handleOpenEditModal}
             onDeleteRow={handleDeleteRow}
           />
         </div>
 
-        {/* Acciones globales al pie de la tabla */}
-        <TableFooterActions
-          onSave={handleSave}
-          onCancel={hasChanges ? handleDiscard : null}
-          saveLabel="Guardar Materiales"
-          cancelLabel="Descartar Cambios"
-          isSaveDisabled={!hasChanges}
-        />
+        {/* Paginación integrada descriptiva */}
+        {totalItems > 0 && (
+          <TablePagination
+            currentPage={validPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalItems={totalItems}
+            showingStart={showingStart}
+            showingEnd={showingEnd}
+            itemType="insumos"
+          />
+        )}
       </Card>
 
       <Card title="Productos Base (Recetas)">
@@ -138,6 +194,17 @@ export default function SubvistaInsumos() {
           El ABM de productos estándar se implementará en la próxima iteración.
         </p>
       </Card>
+
+      {/* Modal interactivo de formulario de insumo */}
+      <InsumoFormModal
+        isOpen={isFormOpen}
+        insumo={activeInsumo}
+        onSave={handleSaveInsumo}
+        onClose={() => {
+          setIsFormOpen(false)
+          setActiveInsumo(null)
+        }}
+      />
 
       {/* Modal de confirmación global para insumos */}
       <ConfirmationModal

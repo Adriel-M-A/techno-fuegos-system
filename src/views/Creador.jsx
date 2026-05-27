@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Save, FileDown, Plus } from 'lucide-react'
-import { Button, Card, PageHeader, Input, Divider, Select, Textarea, ConfirmationModal, SearchableSelect } from '../components/ui'
+import { Save, FileDown, Plus, RotateCcw } from 'lucide-react'
+import { Button, Card, PageHeader, Input, Divider, Select, Textarea, ConfirmationModal, SearchableSelect, TemplateFormModal } from '../components/ui'
 import ProductsTable from '../components/table/ProductsTable'
 import { formatARS } from '../utils/currencyFormatters'
 import { MOCK_CATALOGO, MOCK_EMPLEADOS, MOCK_PLANTILLAS } from '../data'
@@ -16,10 +16,34 @@ import { MOCK_CATALOGO, MOCK_EMPLEADOS, MOCK_PLANTILLAS } from '../data'
  * En prod: se reemplaza el estado inicial por invoke() correspondiente.
  */
 export default function Creador() {
-  // Fila inicial con campo snake_case — coincide con el futuro struct ItemPresupuesto
-  const [productRows, setProductRows] = useState([
-    { id: crypto.randomUUID(), product_id: '', quantity: 1, unit_price_centavos: 0 }
-  ])
+  // --- Estados controlados del formulario ---
+  const [nombreCliente, setNombreCliente] = useState('')
+  const [telefonoCliente, setTelefonoCliente] = useState('')
+  const [emailCliente, setEmailCliente] = useState('')
+  const [localidadCliente, setLocalidadCliente] = useState('')
+
+  const [manoDeObraCentavos, setManoDeObraCentavos] = useState(0)
+  const [manoDeObraPesosText, setManoDeObraPesosText] = useState('')
+
+  // Manejador del costo de la mano de obra con soporte decimal y Safe Money
+  const handleManoDeObraChange = (e) => {
+    const text = e.target.value
+    setManoDeObraPesosText(text)
+
+    // Normalizar coma por punto para el parseado matemático
+    const normalizedText = text.replace(',', '.')
+    const pesosFloat = parseFloat(normalizedText)
+    if (!isNaN(pesosFloat) && pesosFloat >= 0) {
+      setManoDeObraCentavos(Math.round(pesosFloat * 100))
+    } else {
+      setManoDeObraCentavos(0)
+    }
+  }
+
+  const [vendedorId, setVendedorId] = useState('')
+  const [observaciones, setObservaciones] = useState('')
+
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false)
 
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
@@ -85,15 +109,37 @@ export default function Creador() {
     })
   }
 
+  // Fila inicial con campo snake_case — coincide con el futuro struct ItemPresupuesto
+  const [productRows, setProductRows] = useState([
+    { id: crypto.randomUUID(), product_id: '', quantity: 1, unit_price_centavos: 0 }
+  ])
+
   const handleSaveTemplate = () => {
+    setIsTemplateModalOpen(true)
+  }
+
+  const handleSaveTemplateConfirm = (nombrePlantilla) => {
+    const nuevaPlantilla = {
+      id: `tmpl-${crypto.randomUUID()}`,
+      nombre: nombrePlantilla,
+      descripcion_general: descripcionGeneral,
+      mano_de_obra_centavos: manoDeObraCentavos, // Persistencia de la mano de obra en plantilla
+      items: productRows.filter(row => row.product_id !== '').map(row => ({
+        product_id: row.product_id,
+        quantity: row.quantity,
+        unit_price_centavos: row.unit_price_centavos
+      }))
+    }
+    MOCK_PLANTILLAS.push(nuevaPlantilla)
+    setSelectedTemplate(nuevaPlantilla.id)
+    setIsTemplateModalOpen(false)
+
     showConfirm({
-      title: 'Guardar como plantilla',
-      message: '¿Deseas guardar la configuración de ítems frecuentes de este presupuesto como una plantilla reutilizable?',
+      title: 'Plantilla Guardada',
+      message: `La plantilla "${nombrePlantilla}" ha sido creada exitosamente con los ítems y descripción del formulario actual.`,
       variant: 'success',
-      confirmText: 'Guardar plantilla',
-      onConfirm: () => {
-        // En prod: invoke('guardar_plantilla', { items: productRows })
-      }
+      confirmText: 'Aceptar',
+      onConfirm: () => {}
     })
   }
 
@@ -126,7 +172,8 @@ export default function Creador() {
     (acc, row) => acc + row.unit_price_centavos * row.quantity,
     0
   )
-  const totalCentavos = subtotalCentavos // Sin modificadores por ahora
+  // Suma exacta en centavos de los materiales y la mano de obra
+  const totalCentavos = subtotalCentavos + manoDeObraCentavos
 
   // Deshabilitar botones si el total es 0 centavos
   const isTotalEmpty = totalCentavos === 0
@@ -138,6 +185,171 @@ export default function Creador() {
 
   // Estado de la plantilla seleccionada
   const [selectedTemplate, setSelectedTemplate] = useState('')
+
+  // Estado para la descripción general del presupuesto
+  const [descripcionGeneral, setDescripcionGeneral] = useState('')
+
+  // Manejador de cambio de plantilla: autopopula la grilla interactiva y el textarea en caliente
+  const handleTemplateChange = (e) => {
+    const templateId = e.target.value
+    setSelectedTemplate(templateId)
+
+    if (!templateId) {
+      // Limpiar grilla a una fila vacía estándar y limpiar descripción y mano de obra
+      setProductRows([
+        { id: crypto.randomUUID(), product_id: '', quantity: 1, unit_price_centavos: 0 }
+      ])
+      setDescripcionGeneral('')
+      setManoDeObraCentavos(0)
+      setManoDeObraPesosText('')
+      return
+    }
+
+    // Buscar plantilla en los mocks locales
+    const template = MOCK_PLANTILLAS.find(t => t.id === templateId)
+    if (template) {
+      // Cargar descripción general correspondiente
+      setDescripcionGeneral(template.descripcion_general || '')
+
+      // Cargar mano de obra si está definida en la plantilla
+      if (template.mano_de_obra_centavos !== undefined && template.mano_de_obra_centavos !== null) {
+        setManoDeObraCentavos(template.mano_de_obra_centavos)
+        const pesosFloat = template.mano_de_obra_centavos / 100
+        setManoDeObraPesosText(pesosFloat > 0 ? pesosFloat.toString().replace('.', ',') : '')
+      } else {
+        setManoDeObraCentavos(0)
+        setManoDeObraPesosText('')
+      }
+
+      if (template.items) {
+        // Inyectar en bloque los ítems de la plantilla — Safe Money (centavos enteros)
+        setProductRows(template.items.map(item => ({
+          id: crypto.randomUUID(),
+          product_id: item.product_id,
+          quantity: item.quantity,
+          unit_price_centavos: item.unit_price_centavos
+        })))
+      }
+    }
+  }
+
+  // Actualizar plantilla en caliente localmente con comparador quirúrgico
+  const handleUpdateTemplate = () => {
+    if (!selectedTemplate) return
+    const index = MOCK_PLANTILLAS.findIndex(t => t.id === selectedTemplate)
+    if (index === -1) return
+
+    const plantillaPrevia = MOCK_PLANTILLAS[index]
+    const prevItems = plantillaPrevia.items || []
+    const currentItems = productRows.filter(row => row.product_id !== '')
+
+    const cambiosDetectados = []
+
+    // 1. Detectar materiales eliminados o con cantidad modificada
+    prevItems.forEach(prev => {
+      const curr = currentItems.find(c => c.product_id === prev.product_id)
+      const producto = MOCK_CATALOGO.find(p => p.id === prev.product_id)
+      const nombreProd = producto ? producto.nombre : prev.product_id
+
+      if (!curr) {
+        cambiosDetectados.push(`Se quitó el material/servicio: "${nombreProd}"`)
+      } else if (curr.quantity !== prev.quantity) {
+        cambiosDetectados.push(`Se modificó la cantidad de "${nombreProd}": ${prev.quantity} -> ${curr.quantity}`)
+      }
+    })
+
+    // 2. Detectar materiales agregados nuevos
+    currentItems.forEach(curr => {
+      const prev = prevItems.find(p => p.product_id === curr.product_id)
+      const producto = MOCK_CATALOGO.find(p => p.id === curr.product_id)
+      const nombreProd = producto ? producto.nombre : curr.product_id
+
+      if (!prev) {
+        cambiosDetectados.push(`Se agregó el material/servicio: "${nombreProd}" (Cantidad: ${curr.quantity})`)
+      }
+    })
+
+    // 3. Detectar cambios en la descripción general
+    const prevDesc = plantillaPrevia.descripcion_general || ''
+    const currentDesc = descripcionGeneral || ''
+    if (prevDesc.trim() !== currentDesc.trim()) {
+      if (!prevDesc.trim() && currentDesc.trim()) {
+        cambiosDetectados.push('Se agregó la descripción general a la plantilla')
+      } else if (prevDesc.trim() && !currentDesc.trim()) {
+        cambiosDetectados.push('Se quitó la descripción general de la plantilla')
+      } else {
+        cambiosDetectados.push('Se modificó el texto de la descripción general')
+      }
+    }
+
+    // 4. Detectar cambios en la mano de obra
+    const prevManoObra = plantillaPrevia.mano_de_obra_centavos || 0
+    if (prevManoObra !== manoDeObraCentavos) {
+      if (prevManoObra === 0 && manoDeObraCentavos > 0) {
+        cambiosDetectados.push(`Se agregó el costo de Mano de Obra: ${formatARS(manoDeObraCentavos)}`)
+      } else if (prevManoObra > 0 && manoDeObraCentavos === 0) {
+        cambiosDetectados.push(`Se eliminó el costo de Mano de Obra: ${formatARS(prevManoObra)}`)
+      } else {
+        cambiosDetectados.push(`Se modificó el costo de Mano de Obra: ${formatARS(prevManoObra)} -> ${formatARS(manoDeObraCentavos)}`)
+      }
+    }
+
+    // Contenido del cuerpo del modal
+    const bodyContent = cambiosDetectados.length === 0 ? (
+      <span>No se registraron cambios entre el formulario actual y el modelo original de la plantilla.</span>
+    ) : (
+      <div className="flex flex-col gap-2">
+        <span className="font-semibold text-on-surface">Se registraron las siguientes modificaciones con respecto a la plantilla original:</span>
+        <ul className="list-disc pl-5 text-xs text-on-surface-variant flex flex-col gap-1">
+          {cambiosDetectados.map((c, i) => (
+            <li key={i}>{c}</li>
+          ))}
+        </ul>
+        <span className="mt-2 text-xs font-semibold text-tertiary">¿Deseas sobreescribir la plantilla con estos cambios de taller?</span>
+      </div>
+    )
+
+    showConfirm({
+      title: 'Actualizar Plantilla',
+      message: bodyContent,
+      variant: 'warning',
+      confirmText: 'Actualizar',
+      onConfirm: () => {
+        MOCK_PLANTILLAS[index].items = currentItems.map(row => ({
+          product_id: row.product_id,
+          quantity: row.quantity,
+          unit_price_centavos: row.unit_price_centavos
+        }))
+        MOCK_PLANTILLAS[index].descripcion_general = descripcionGeneral
+        MOCK_PLANTILLAS[index].mano_de_obra_centavos = manoDeObraCentavos // Guardar mano de obra actualizada
+      }
+    })
+  }
+
+  // Restablecido absoluto e integral de todo el formulario
+  const handleResetForm = () => {
+    showConfirm({
+      title: 'Restablecer Formulario',
+      message: '¿Estás seguro de que deseas limpiar por completo este presupuesto? Se borrarán todos los datos del cliente, la descripción general, las filas de productos y la logística.',
+      variant: 'warning',
+      confirmText: 'Restablecer Todo',
+      onConfirm: () => {
+        setSelectedTemplate('')
+        setDescripcionGeneral('')
+        setProductRows([
+          { id: crypto.randomUUID(), product_id: '', quantity: 1, unit_price_centavos: 0 }
+        ])
+        setNombreCliente('')
+        setTelefonoCliente('')
+        setEmailCliente('')
+        setLocalidadCliente('')
+        setManoDeObraCentavos(0)
+        setManoDeObraPesosText('')
+        setVendedorId('')
+        setObservaciones('')
+      }
+    })
+  }
 
   return (
     <div className="p-6 flex flex-col gap-4">
@@ -157,25 +369,21 @@ export default function Creador() {
               className="min-w-[240px]"
               placeholder="Sin plantilla"
               value={selectedTemplate}
-              onChange={(e) => setSelectedTemplate(e.target.value)}
+              onChange={handleTemplateChange}
               options={[
                 { value: '', label: 'Sin plantilla' },
                 ...MOCK_PLANTILLAS.map(t => ({ value: t.id, label: t.nombre }))
               ]}
             />
-          </div>
-
-          {/* Separador */}
-          <div className="h-6 w-px bg-outline-variant/60" />
-
-          {/* ID de Presupuesto */}
-          <div className="flex items-center gap-2">
-            <span className="label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider select-none shrink-0">
-              ID:
-            </span>
-            <span className="px-3 py-1.5 bg-surface-container-low/60 border border-outline-variant/60 text-sm font-mono font-bold text-on-surface select-all rounded-sm">
-              PRE-2024-0001
-            </span>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleResetForm}
+              className="flex items-center justify-center p-1.5 cursor-pointer shrink-0"
+              title="Restablecer presupuesto"
+            >
+              <RotateCcw size={14} />
+            </Button>
           </div>
         </div>
       </PageHeader>
@@ -186,10 +394,10 @@ export default function Creador() {
         {/* Sección A — Datos del cliente */}
         <Card title="Datos del Cliente">
           <div className="grid grid-cols-4 gap-4">
-            <Input label="Nombre" placeholder="Nombre del cliente" />
-            <Input label="Teléfono" placeholder="+54 911 0000 0000" type="tel" />
-            <Input label="Email" placeholder="correo@ejemplo.com" type="email" />
-            <Input label="Localidad" placeholder="Pilar, Buenos Aires" />
+            <Input label="Nombre" placeholder="Nombre del cliente" value={nombreCliente} onChange={(e) => setNombreCliente(e.target.value)} />
+            <Input label="Teléfono" placeholder="+54 911 0000 0000" type="tel" value={telefonoCliente} onChange={(e) => setTelefonoCliente(e.target.value)} />
+            <Input label="Email" placeholder="correo@ejemplo.com" type="email" value={emailCliente} onChange={(e) => setEmailCliente(e.target.value)} />
+            <Input label="Localidad" placeholder="Pilar, Buenos Aires" value={localidadCliente} onChange={(e) => setLocalidadCliente(e.target.value)} />
           </div>
         </Card>
 
@@ -201,6 +409,8 @@ export default function Creador() {
             rows={3}
             maxLength={250}
             showCounter={true}
+            value={descripcionGeneral}
+            onChange={(e) => setDescripcionGeneral(e.target.value)}
           />
         </Card>
 
@@ -228,12 +438,17 @@ export default function Creador() {
           />
         </Card>
 
-        {/* Sección D — Personalización y Modificaciones */}
-        <Card title="Personalización y Modificaciones">
+        {/* Sección D — Mano de Obra */}
+        <Card title="Mano de Obra">
           <div className="grid grid-cols-3 gap-4">
-            <Input label="Kg extras de hierro" placeholder="0" numericMode="decimal" maxLength={6} />
-            <Input label="Horas soldadura extra" placeholder="0" numericMode="integer" maxLength={4} />
-            <Input label="Herrajes especiales" placeholder="Descripción" />
+            <Input
+              label="Costo Mano de Obra ($)"
+              placeholder="0,00"
+              value={manoDeObraPesosText}
+              onChange={handleManoDeObraChange}
+              numericMode="decimal"
+              maxLength={12}
+            />
           </div>
         </Card>
 
@@ -241,7 +456,7 @@ export default function Creador() {
         <Card title="Control y Logística">
           <div className="grid grid-cols-2 gap-4">
             {/* Selector de vendedor — solo activos desde MOCK_EMPLEADOS centralizado */}
-            <Select label="Vendedor" defaultValue="">
+            <Select label="Vendedor" value={vendedorId} onChange={(e) => setVendedorId(e.target.value)}>
               <option value="" disabled>Seleccionar vendedor...</option>
               {empleadosActivos.map(e => (
                 <option key={e.id} value={e.id}>{e.nombre}</option>
@@ -253,6 +468,8 @@ export default function Creador() {
               rows={3}
               maxLength={200}
               showCounter={true}
+              value={observaciones}
+              onChange={(e) => setObservaciones(e.target.value)}
             />
           </div>
         </Card>
@@ -270,8 +487,8 @@ export default function Creador() {
           </div>
           <Divider orientation="vertical" className="h-10" />
           <div className="flex flex-col items-start">
-            <span className="label-md text-on-surface-variant uppercase">Modificadores</span>
-            <span className="mono-data text-on-surface font-bold">{formatARS(0)}</span>
+            <span className="label-md text-on-surface-variant uppercase">Mano de Obra</span>
+            <span className="mono-data text-on-surface font-bold">{formatARS(manoDeObraCentavos)}</span>
           </div>
           <Divider orientation="vertical" className="h-10" />
           <div className="flex flex-col items-start">
@@ -282,6 +499,17 @@ export default function Creador() {
 
         {/* Acciones */}
         <div className="flex items-center gap-3">
+          {selectedTemplate && (
+            <Button
+              variant="secondary"
+              size="md"
+              disabled={isTotalEmpty}
+              onClick={handleUpdateTemplate}
+            >
+              <Save size={15} />
+              Actualizar Plantilla
+            </Button>
+          )}
           <Button variant="secondary" size="md" disabled={isTotalEmpty} onClick={handleSaveTemplate}>
             <Save size={15} />
             Guardar Plantilla
@@ -307,6 +535,13 @@ export default function Creador() {
         confirmText={modalConfig.confirmText}
         onConfirm={modalConfig.onConfirm}
         onCancel={handleCloseModal}
+      />
+
+      {/* Modal interactivo para capturar el nombre de la nueva plantilla */}
+      <TemplateFormModal
+        isOpen={isTemplateModalOpen}
+        onSave={handleSaveTemplateConfirm}
+        onClose={() => setIsTemplateModalOpen(false)}
       />
 
     </div>

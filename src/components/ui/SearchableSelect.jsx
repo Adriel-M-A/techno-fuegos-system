@@ -79,10 +79,8 @@ export default function SearchableSelect({
     setIsOpen(false)
   }
 
-  // Filtrado local inteligente con un umbral de activación de 3 caracteres
-  const isSearchActive = searchTerm.trim().length >= 3
+  // Filtrado local inteligente reactivo e instantáneo desde la primera letra
   const filteredOptions = options.filter(opt => {
-    if (!isSearchActive) return true // Muestra la lista completa si no hay suficiente longitud de búsqueda
     return opt.label.toLowerCase().includes(searchTerm.toLowerCase())
   })
 
@@ -155,7 +153,7 @@ export default function SearchableSelect({
             width: `${coords.width}px`,
             zIndex: 9999,
           }}
-          className="bg-surface-container-lowest border border-outline-variant/60 rounded-md shadow-[var(--shadow-raised)] overflow-hidden flex flex-col"
+          className="bg-surface-container-lowest border border-outline-variant/60 rounded-md shadow-raised overflow-hidden flex flex-col"
         >
           
           {/* Campo buscador interno */}
@@ -167,7 +165,7 @@ export default function SearchableSelect({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Buscar (escribir mínimo 3 letras)..."
+              placeholder="Buscar insumo o servicio..."
               className="w-full text-xs text-on-surface bg-transparent focus:outline-none placeholder:text-on-surface-variant/40"
             />
             {searchTerm && (
