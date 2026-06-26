@@ -25,3 +25,8 @@ dist-ssr
 
 # Variables de entorno
 .env
+
+# Agentes de IA y Skills
+.agents/
+skills-lock.json
+AGENTS.md

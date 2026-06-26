@@ -74,6 +74,7 @@ Crear un archivo `.env` en la raíz basándote en `.env.example`:
 DATABASE_URL="src-tauri/storage.db"
 APP_ENV="development"
 APP_NAME="techno-fuegos-system"
+CONTEXT7_API_KEY="tu-api-key-de-context7"
 ```
 
 ### 4. Correr en modo desarrollo
@@ -90,11 +91,6 @@ pnpm tauri dev
 
 ```
 techno-fuegos-system/
-├── .agents/                  # Skills y configuración de agentes IA del IDE
-│   └── skills/               # Habilidades locales personalizadas
-├── docs/                     # Documentación técnica del proyecto
-│   ├── PRD.md                # Product Requirements Document
-│   └── DESIGN.md             # Guía de diseño visual e identidad
 ├── src/                      # Código fuente del frontend (React + JS)
 │   ├── components/           # Componentes visuales reutilizables
 │   ├── manual/               # Archivo .md del manual de usuario interno
@@ -105,14 +101,16 @@ techno-fuegos-system/
 │   │   └── main.rs           # Inicialización, comandos IPC y conexión SQLite
 │   └── tauri.conf.json       # Manifiesto de capacidades y configuración
 ├── .env.example              # Plantilla de variables de entorno
-├── AGENTS.md                 # Contexto de desarrollo para asistentes de IA
 └── README.md                 # Este archivo
 ```
+
+> [!NOTE]
+> La documentación técnica formal del proyecto (como el PRD y la Guía de Diseño) se encuentra centralizada en la base de conocimiento externa de Obsidian. Archivos como `.agents/`, `AGENTS.md` y `skills-lock.json` están excluidos del control de versiones por seguridad de credenciales y personalización local de entornos.
 
 ---
 
 ## Licencia
 
-Este proyecto es de uso privado y propietario. Todos los derechos reservados © 2025 Techno Fuegos.
+Este proyecto es de uso privado y propietario. Todos los derechos reservados © 2026 Techno Fuegos.
 
 No está permitida la reproducción, distribución ni modificación del código fuente sin autorización expresa del titular.
