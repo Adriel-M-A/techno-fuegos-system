@@ -3,7 +3,7 @@ import { Button, Card, ConfirmationModal, InsumoFormModal, Input, Select } from 
 import { Plus, Search } from 'lucide-react'
 import { InsumosTable } from '../../components/table'
 import TablePagination from '../../components/table/TablePagination'
-import { MOCK_INSUMOS } from '../../data'
+import useDataStore from '../../stores/dataStore'
 import { CATEGORIAS_INSUMOS } from '../../components/ui/InsumoFormModal'
 
 /**
@@ -13,8 +13,7 @@ import { CATEGORIAS_INSUMOS } from '../../components/ui/InsumoFormModal'
  * Todos los costos operan con costo_centavos (INTEGER) — SAFE MONEY.
  */
 export default function SubvistaInsumos() {
-  // Carga inicial de insumos desde el mock centralizado
-  const [insumos, setInsumos] = useState(MOCK_INSUMOS)
+  const { insumos, updateInsumoLocal, deleteInsumoLocal } = useDataStore()
 
   // Estados de filtrado reactivo
   const [searchQuery, setSearchQuery] = useState('')
@@ -72,12 +71,11 @@ export default function SubvistaInsumos() {
 
   // Confirmar y guardar el insumo (creación o edición)
   const handleSaveInsumo = (insumoData) => {
-    if (activeInsumo) {
-      // Modo Edición: mapear y actualizar
-      setInsumos(prev => prev.map(item => item.id === insumoData.id ? insumoData : item))
-    } else {
-      // Modo Creación: insertar al principio, limpiar filtros para verlo, y redirigir a la página 1
-      setInsumos(prev => [insumoData, ...prev])
+    // En prod: await invoke('save_insumo', { insumo: insumoData })
+    updateInsumoLocal(insumoData)
+
+    if (!activeInsumo) {
+      // Modo Creación: limpiar filtros para verlo y redirigir a la página 1
       setSearchQuery('')
       setSelectedCategory('')
       setCurrentPage(1)
@@ -88,7 +86,8 @@ export default function SubvistaInsumos() {
 
   // Eliminar un insumo de la lista local
   const handleDeleteRow = (id) => {
-    setInsumos(prev => prev.filter(item => item.id !== id))
+    // En prod: await invoke('delete_insumo', { id })
+    deleteInsumoLocal(id)
     
     // Si la página se queda vacía después de eliminar, retroceder una página
     const newTotalItems = insumos.length - 1

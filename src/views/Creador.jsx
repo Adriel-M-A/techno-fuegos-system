@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Save, FileDown, Plus, RotateCcw } from 'lucide-react'
 import { Button, Card, PageHeader, Input, Divider, Select, Textarea, ConfirmationModal, SearchableSelect, TemplateFormModal } from '../components/ui'
 import ProductsTable from '../components/table/ProductsTable'
 import { formatARS } from '../utils/currencyFormatters'
-import { MOCK_CATALOGO, MOCK_EMPLEADOS, MOCK_PLANTILLAS } from '../data'
+import { MOCK_PLANTILLAS } from '../data'
+import useDataStore from '../stores/dataStore'
+import { generateAndSavePresupuestoPDF } from '../utils/pdfGenerator'
 
 /**
  * Creador de Presupuestos
@@ -16,6 +18,8 @@ import { MOCK_CATALOGO, MOCK_EMPLEADOS, MOCK_PLANTILLAS } from '../data'
  * En prod: se reemplaza el estado inicial por invoke() correspondiente.
  */
 export default function Creador() {
+  const { productos, empleados } = useDataStore()
+
   // --- Estados controlados del formulario ---
   const [nombreCliente, setNombreCliente] = useState('')
   const [telefonoCliente, setTelefonoCliente] = useState('')
@@ -81,7 +85,7 @@ export default function Creador() {
 
   // Al seleccionar un producto, asignar unit_price_centavos desde el catálogo
   const handleProductChange = (rowId, newProductId) => {
-    const producto = MOCK_CATALOGO.find(p => p.id === newProductId)
+    const producto = productos.find(p => p.id === newProductId)
     // precio_centavos: INTEGER desde el mock/SQLite — SAFE MONEY
     const precio = producto ? producto.precio_centavos : 0
     setProductRows(prev => prev.map(row =>
@@ -161,8 +165,37 @@ export default function Creador() {
       message: '¿Deseas generar y descargar el reporte del presupuesto en formato PDF monocromático para taller?',
       variant: 'info',
       confirmText: 'Exportar PDF',
-      onConfirm: () => {
-        // En prod: lógica jsPDF + jspdf-autotable
+      onConfirm: async () => {
+        const presupuestoData = {
+          nombreCliente,
+          telefonoCliente,
+          localidadCliente,
+          emailCliente,
+          descripcionGeneral,
+          productRows,
+          subtotalCentavos,
+          manoDeObraCentavos,
+          totalCentavos,
+          observaciones
+        }
+        const result = await generateAndSavePresupuestoPDF(presupuestoData, productos)
+        if (result.success) {
+          showConfirm({
+            title: 'Exportación Exitosa',
+            message: `El PDF se guardó correctamente.`,
+            variant: 'success',
+            confirmText: 'Aceptar',
+            onConfirm: () => {}
+          })
+        } else if (!result.cancelled) {
+          showConfirm({
+            title: 'Error de Exportación',
+            message: 'Ocurrió un error al intentar guardar el PDF.',
+            variant: 'danger',
+            confirmText: 'Aceptar',
+            onConfirm: () => {}
+          })
+        }
       }
     })
   }
@@ -181,13 +214,54 @@ export default function Creador() {
   const isLastRowEmpty = productRows.length > 0 && productRows[productRows.length - 1].product_id === ''
 
   // Solo empleados activos (activo = 1) en el selector
-  const empleadosActivos = MOCK_EMPLEADOS.filter(e => e.activo === 1)
+  const empleadosActivos = empleados.filter(e => e.activo === 1)
 
   // Estado de la plantilla seleccionada
   const [selectedTemplate, setSelectedTemplate] = useState('')
 
   // Estado para la descripción general del presupuesto
   const [descripcionGeneral, setDescripcionGeneral] = useState('')
+
+  // --- Autoguardado (LocalStorage) ---
+  const AUTOSAVE_KEY = 'techno_fuegos_draft'
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  useEffect(() => {
+    const saved = localStorage.getItem(AUTOSAVE_KEY)
+    if (saved) {
+      try {
+        const data = JSON.parse(saved)
+        if (data.nombreCliente) setNombreCliente(data.nombreCliente)
+        if (data.telefonoCliente) setTelefonoCliente(data.telefonoCliente)
+        if (data.emailCliente) setEmailCliente(data.emailCliente)
+        if (data.localidadCliente) setLocalidadCliente(data.localidadCliente)
+        if (data.manoDeObraCentavos) setManoDeObraCentavos(data.manoDeObraCentavos)
+        if (data.manoDeObraPesosText) setManoDeObraPesosText(data.manoDeObraPesosText)
+        if (data.vendedorId) setVendedorId(data.vendedorId)
+        if (data.observaciones) setObservaciones(data.observaciones)
+        if (data.descripcionGeneral) setDescripcionGeneral(data.descripcionGeneral)
+        if (data.selectedTemplate) setSelectedTemplate(data.selectedTemplate)
+        if (data.productRows && data.productRows.length > 0) setProductRows(data.productRows)
+      } catch (e) {
+        console.error('Error al recuperar borrador', e)
+      }
+    }
+    setIsLoaded(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isLoaded) return
+    const data = {
+      nombreCliente, telefonoCliente, emailCliente, localidadCliente,
+      manoDeObraCentavos, manoDeObraPesosText, vendedorId, observaciones,
+      descripcionGeneral, selectedTemplate, productRows
+    }
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data))
+  }, [
+    isLoaded, nombreCliente, telefonoCliente, emailCliente, localidadCliente,
+    manoDeObraCentavos, manoDeObraPesosText, vendedorId, observaciones,
+    descripcionGeneral, selectedTemplate, productRows
+  ])
 
   // Manejador de cambio de plantilla: autopopula la grilla interactiva y el textarea en caliente
   const handleTemplateChange = (e) => {
@@ -248,7 +322,7 @@ export default function Creador() {
     // 1. Detectar materiales eliminados o con cantidad modificada
     prevItems.forEach(prev => {
       const curr = currentItems.find(c => c.product_id === prev.product_id)
-      const producto = MOCK_CATALOGO.find(p => p.id === prev.product_id)
+      const producto = productos.find(p => p.id === prev.product_id)
       const nombreProd = producto ? producto.nombre : prev.product_id
 
       if (!curr) {
@@ -261,7 +335,7 @@ export default function Creador() {
     // 2. Detectar materiales agregados nuevos
     currentItems.forEach(curr => {
       const prev = prevItems.find(p => p.product_id === curr.product_id)
-      const producto = MOCK_CATALOGO.find(p => p.id === curr.product_id)
+      const producto = productos.find(p => p.id === curr.product_id)
       const nombreProd = producto ? producto.nombre : curr.product_id
 
       if (!prev) {
@@ -430,8 +504,10 @@ export default function Creador() {
             </Button>
           }
         >
+          {/* Inyección de tabla de materiales (Patrón A) */}
           <ProductsTable
             rows={productRows}
+            catalogo={productos}
             onProductChange={handleProductChange}
             onQuantityChange={handleQuantityChange}
             onDeleteRow={handleDeleteProductRow}

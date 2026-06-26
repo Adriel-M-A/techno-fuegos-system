@@ -3,8 +3,8 @@ import { Plus, Send, Eye, Download, Pencil, RotateCcw, Trash2 } from 'lucide-rea
 import { Button, PageHeader, Select, StatusBadge, ConfirmationModal } from '../components/ui'
 import { DataTable, TableActionButton, TablePagination } from '../components/table'
 import { formatARS } from '../utils/currencyFormatters'
-import { MOCK_PRESUPUESTOS } from '../data'
 import useNavigationStore from '../stores/navigationStore'
+import useDataStore from '../stores/dataStore'
 
 const ITEMS_PER_PAGE = 4
 
@@ -16,6 +16,7 @@ const ITEMS_PER_PAGE = 4
  */
 export default function Dashboard() {
   const setVista = useNavigationStore((state) => state.setVista)
+  const { presupuestos } = useDataStore()
 
   const [filtroEstado, setFiltroEstado] = useState('todos')
   const [filtroVendedor, setFiltroVendedor] = useState('todos')
@@ -78,8 +79,49 @@ export default function Dashboard() {
       message: `¿Deseas exportar y descargar el presupuesto de "${p.cliente_nombre}" en formato PDF monocromático para taller?`,
       variant: 'info',
       confirmText: 'Exportar PDF',
-      onConfirm: () => {
-        // En prod: lógica jsPDF + jspdf-autotable
+      onConfirm: async () => {
+        // En prod real se debería hacer un invoke('get_presupuesto', { id })
+        // Por ahora construimos un objeto compatible con lo que tenemos
+        const presupuestoData = {
+          nombreCliente: p.cliente_nombre,
+          fecha_emision: p.fecha_emision,
+          descripcionGeneral: `Presupuesto N° ${p.id} - ${p.estado.toUpperCase()}`,
+          productRows: [
+            {
+              product_id: 'generico', // Si no tenemos ID real
+              quantity: 1,
+              unit_price_centavos: p.total_centavos
+            }
+          ],
+          subtotalCentavos: p.total_centavos,
+          manoDeObraCentavos: 0,
+          totalCentavos: p.total_centavos,
+          observaciones: `Vendedor: ${p.vendedor_nombre}`
+        }
+
+        // Para evitar fallos en el find() del catálogo, pasamos un catálogo con el ítem genérico
+        const catalogMock = [{ id: 'generico', nombre: 'Presupuesto Completo (Resumen)' }]
+        
+        const { generateAndSavePresupuestoPDF } = await import('../utils/pdfGenerator')
+        const result = await generateAndSavePresupuestoPDF(presupuestoData, catalogMock)
+        
+        if (result.success) {
+          showConfirm({
+            title: 'Exportación Exitosa',
+            message: `El PDF se guardó correctamente.`,
+            variant: 'success',
+            confirmText: 'Aceptar',
+            onConfirm: () => {}
+          })
+        } else if (!result.cancelled) {
+          showConfirm({
+            title: 'Error de Exportación',
+            message: 'Ocurrió un error al intentar guardar el PDF.',
+            variant: 'danger',
+            confirmText: 'Aceptar',
+            onConfirm: () => {}
+          })
+        }
       }
     })
   }
@@ -95,23 +137,25 @@ export default function Dashboard() {
     setPaginaActiva(1)
   }
 
-  // Construir lista dinámica de vendedores únicos desde el mock
-  const vendedoresUnicos = [...new Set(MOCK_PRESUPUESTOS.map(p => p.vendedor_nombre))]
+  // Construir lista dinámica de vendedores únicos desde el store
+  const vendedoresUnicos = [...new Set(presupuestos.map(p => p.vendedor_nombre))]
 
-  // Filtrado de presupuestos
-  const presupuestosFiltrados = MOCK_PRESUPUESTOS.filter((p) => {
-    const coincideEstado = filtroEstado === 'todos' || p.estado === filtroEstado
-    const coincideVendedor = filtroVendedor === 'todos' || p.vendedor_nombre === filtroVendedor
-    return coincideEstado && coincideVendedor
+  // Filtrado local
+  const presupuestosFiltrados = presupuestos.filter(p => {
+    const matchEstado = filtroEstado === 'todos' || p.estado === filtroEstado
+    const matchVendedor = filtroVendedor === 'todos' || p.vendedor_nombre === filtroVendedor
+    // Excluir plantillas, solo presupuestos emitidos o borradores
+    const noEsPlantilla = !p.es_plantilla
+    return matchEstado && matchVendedor && noEsPlantilla
   })
 
   // Métricas calculadas dinámicamente desde los mocks (centavos enteros)
-  const totalAceptadoCentavos = MOCK_PRESUPUESTOS
+  const totalAceptadoCentavos = presupuestos
     .filter(p => p.estado === 'aceptado')
     .reduce((acc, p) => acc + p.total_centavos, 0)
 
-  const cantidadEntregados = MOCK_PRESUPUESTOS.filter(p => p.estado === 'entregado').length
-  const cantidadVencidos = MOCK_PRESUPUESTOS.filter(p => p.estado === 'vencido').length
+  const cantidadEntregados = presupuestos.filter(p => p.estado === 'entregado').length
+  const cantidadVencidos = presupuestos.filter(p => p.estado === 'vencido').length
 
   // Lógica de paginación
   const totalItems = presupuestosFiltrados.length

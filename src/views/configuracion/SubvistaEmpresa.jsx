@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button, Card, Input, Divider, Textarea, QuantityInput, ConfirmationModal } from '../../components/ui'
-import { MOCK_CONFIG_EMPRESA } from '../../data'
+import useDataStore from '../../stores/dataStore'
 
 /**
  * SubvistaEmpresa
@@ -11,22 +11,23 @@ import { MOCK_CONFIG_EMPRESA } from '../../data'
  * Campos: snake_case idénticos al struct ConfigEmpresa de Rust / tabla config_empresa de SQLite.
  */
 export default function SubvistaEmpresa() {
+  const { configuracion } = useDataStore()
+
   // Estado separado por sección para detección de cambios granular
-  // (en prod: se reemplaza el estado inicial por invoke('obtener_config_empresa'))
   const [empresa, setEmpresa] = useState({
-    nombre: MOCK_CONFIG_EMPRESA.nombre,
-    telefono: MOCK_CONFIG_EMPRESA.telefono,
-    direccion: MOCK_CONFIG_EMPRESA.direccion,
-    email: MOCK_CONFIG_EMPRESA.email,
-    instagram: MOCK_CONFIG_EMPRESA.instagram,
-    web: MOCK_CONFIG_EMPRESA.web,
+    nombre: configuracion?.nombre || '',
+    telefono: configuracion?.telefono || '',
+    direccion: configuracion?.direccion || '',
+    email: configuracion?.email || '',
+    instagram: configuracion?.instagram || '',
+    web: configuracion?.web || '',
   })
   const [empresaGuardada, setEmpresaGuardada] = useState({ ...empresa })
 
   const [parametros, setParametros] = useState({
-    validez_dias: MOCK_CONFIG_EMPRESA.validez_dias,
-    clausula_sena: MOCK_CONFIG_EMPRESA.clausula_sena,
-    clausula_inflacion: MOCK_CONFIG_EMPRESA.clausula_inflacion,
+    validez_dias: configuracion?.validez_dias || 15,
+    clausula_sena: configuracion?.clausula_sena || '',
+    clausula_inflacion: configuracion?.clausula_inflacion || '',
   })
   const [parametrosGuardados, setParametrosGuardados] = useState({ ...parametros })
 

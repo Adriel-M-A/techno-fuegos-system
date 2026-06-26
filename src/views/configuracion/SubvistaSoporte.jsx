@@ -34,28 +34,87 @@ export default function SubvistaSoporte() {
     setModalConfig(prev => ({ ...prev, isOpen: false }))
   }
 
-  const handleExportDB = () => {
-    showConfirm({
-      title: 'Exportar Base de Datos',
-      message: '¿Deseas generar y descargar una copia de seguridad física (.db) de la base de datos actual? Este archivo contendrá todas las recetas, materiales e historial del taller.',
-      variant: 'info',
-      confirmText: 'Exportar copia',
-      onConfirm: () => {
-        console.log('Exportando base de datos bit a bit a través del canal IPC de Tauri...')
+  const handleExportDB = async () => {
+    try {
+      const { save } = await import('@tauri-apps/plugin-dialog')
+      const { invoke } = await import('@tauri-apps/api/core')
+
+      const fechaStr = new Date().toISOString().split('T')[0]
+      const destPath = await save({
+        title: 'Exportar Base de Datos',
+        defaultPath: `techno-fuegos-backup-${fechaStr}.db`,
+        filters: [{ name: 'SQLite Database', extensions: ['db'] }]
+      })
+
+      if (destPath) {
+        showConfirm({
+          title: 'Exportar Base de Datos',
+          message: '¿Deseas generar y descargar una copia de seguridad física (.db) de la base de datos actual? Este archivo contendrá todas las recetas, materiales e historial del taller.',
+          variant: 'info',
+          confirmText: 'Exportar copia',
+          onConfirm: async () => {
+            try {
+              await invoke('export_db', { destPath })
+              showConfirm({
+                title: 'Exportación Exitosa',
+                message: `La base de datos se exportó correctamente en:\n${destPath}`,
+                variant: 'success',
+                confirmText: 'Aceptar',
+                onConfirm: () => {}
+              })
+            } catch (error) {
+              showConfirm({
+                title: 'Error de Exportación',
+                message: `Ocurrió un error al exportar: ${error}`,
+                variant: 'danger',
+                confirmText: 'Aceptar',
+                onConfirm: () => {}
+              })
+            }
+          }
+        })
       }
-    })
+    } catch (e) {
+      console.error(e)
+    }
   }
 
-  const handleImportDB = () => {
-    showConfirm({
-      title: 'ADVERTENCIA: Importar Base de Datos',
-      message: '¿Estás completamente seguro de que deseas importar una base de datos externa? Esta acción es irreversible, reemplazará permanentemente todas tus recetas, materiales e historial por el contenido de la copia de seguridad, y forzará un reinicio completo del sistema.',
-      variant: 'danger',
-      confirmText: 'IMPORTAR Y REINICIAR',
-      onConfirm: () => {
-        console.log('Importando base de datos y forzando reinicio del sistema...')
+  const handleImportDB = async () => {
+    try {
+      const { open } = await import('@tauri-apps/plugin-dialog')
+      const { invoke } = await import('@tauri-apps/api/core')
+
+      const srcPath = await open({
+        title: 'Importar Base de Datos',
+        filters: [{ name: 'SQLite Database', extensions: ['db'] }]
+      })
+
+      if (srcPath) {
+        showConfirm({
+          title: 'ADVERTENCIA: Importar Base de Datos',
+          message: '¿Estás completamente seguro de que deseas importar una base de datos externa? Esta acción es irreversible, reemplazará permanentemente todas tus recetas, materiales e historial por el contenido de la copia de seguridad, y forzará un reinicio completo del sistema.',
+          variant: 'danger',
+          confirmText: 'IMPORTAR Y REINICIAR',
+          onConfirm: async () => {
+            try {
+              await invoke('import_db', { srcPath })
+              // Recargar el frontend una vez que el backend haya reemplazado la base de datos exitosamente
+              window.location.reload()
+            } catch (error) {
+              showConfirm({
+                title: 'Error de Importación',
+                message: `Ocurrió un error al importar: ${error}`,
+                variant: 'danger',
+                confirmText: 'Aceptar',
+                onConfirm: () => {}
+              })
+            }
+          }
+        })
       }
-    })
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   return (
