@@ -74,7 +74,6 @@ Crear un archivo `.env` en la raíz basándote en `.env.example`:
 DATABASE_URL="src-tauri/storage.db"
 APP_ENV="development"
 APP_NAME="techno-fuegos-system"
-CONTEXT7_API_KEY="tu-api-key-de-context7"
 ```
 
 ### 4. Correr en modo desarrollo
