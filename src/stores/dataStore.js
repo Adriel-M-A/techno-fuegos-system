@@ -41,6 +41,15 @@ const useDataStore = create((set, get) => ({
     }
   },
 
+  reloadPresupuestos: async () => {
+    try {
+      const presupuestos = await invoke('get_presupuestos')
+      set({ presupuestos })
+    } catch (error) {
+      console.error("Error al recargar presupuestos:", error)
+    }
+  },
+
   // Acción para actualizar insumos localmente luego de guardar/editar
   updateInsumoLocal: (insumoData) => {
     set((state) => {

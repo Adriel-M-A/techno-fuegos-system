@@ -6,7 +6,7 @@ import DataTable from '../../components/table/DataTable'
 import TableActionButton from '../../components/table/TableActionButton'
 import TablePagination from '../../components/table/TablePagination'
 import { formatARS } from '../../utils/currencyFormatters'
-import { MOCK_PLANTILLAS } from '../../data'
+import useDataStore from '../../stores/dataStore'
 
 /**
  * SubvistaPlantillas
@@ -15,7 +15,8 @@ import { MOCK_PLANTILLAS } from '../../data'
  * confirmación para eliminación y paginación industrial de 20 en 20.
  */
 export default function SubvistaPlantillas() {
-  const [plantillas, setPlantillas] = useState(MOCK_PLANTILLAS)
+  const { presupuestos, reloadPresupuestos } = useDataStore()
+  const plantillas = presupuestos.filter(p => p.es_plantilla === 1)
 
   // Estados de paginación
   const [currentPage, setCurrentPage] = useState(1)
@@ -50,17 +51,18 @@ export default function SubvistaPlantillas() {
   }
 
   // Confirmar cambio de nombre en el modal
-  const handleSaveNombre = () => {
+  const handleSaveNombre = async () => {
     if (!nuevoNombre.trim() || !activePlantilla) return
 
-    setPlantillas(prev => prev.map(t =>
-      t.id === activePlantilla.id ? { ...t, nombre: nuevoNombre.trim() } : t
-    ))
-
-    // Sobreescribir también en el mock importado en caliente
-    const mockIndex = MOCK_PLANTILLAS.findIndex(t => t.id === activePlantilla.id)
-    if (mockIndex !== -1) {
-      MOCK_PLANTILLAS[mockIndex].nombre = nuevoNombre.trim()
+    try {
+      const { invoke } = await import('@tauri-apps/api/core')
+      await invoke('rename_plantilla', { 
+        id: activePlantilla.id, 
+        newName: nuevoNombre.trim() 
+      })
+      await reloadPresupuestos()
+    } catch (e) {
+      console.error("Error al renombrar plantilla", e)
     }
 
     setIsEditOpen(false)
@@ -68,13 +70,13 @@ export default function SubvistaPlantillas() {
   }
 
   // Eliminar una plantilla tras confirmación
-  const handleDelete = (id) => {
-    setPlantillas(prev => prev.filter(t => t.id !== id))
-
-    // Eliminar también del mock centralizado para que el Creador se actualice en vivo
-    const mockIndex = MOCK_PLANTILLAS.findIndex(t => t.id === id)
-    if (mockIndex !== -1) {
-      MOCK_PLANTILLAS.splice(mockIndex, 1)
+  const handleDelete = async (id) => {
+    try {
+      const { invoke } = await import('@tauri-apps/api/core')
+      await invoke('delete_presupuesto', { id })
+      await reloadPresupuestos()
+    } catch (e) {
+      console.error("Error al eliminar plantilla", e)
     }
 
     setConfirmDeleteId(null)
@@ -106,7 +108,7 @@ export default function SubvistaPlantillas() {
       id: row.id,
       nombre: (
         <span className="font-semibold text-on-surface select-text">
-          {row.nombre}
+          {row.nombre_plantilla}
         </span>
       ),
       materiales: (
@@ -125,7 +127,7 @@ export default function SubvistaPlantillas() {
             icon={Pencil}
             title="Modificar nombre"
             variant="primary"
-            onClick={() => handleOpenEdit(row)}
+            onClick={() => handleOpenEdit({ id: row.id, nombre: row.nombre_plantilla })}
           />
           <TableActionButton
             icon={Trash2}

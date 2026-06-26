@@ -3,7 +3,6 @@ import { Save, FileDown, Plus, RotateCcw } from 'lucide-react'
 import { Button, Card, PageHeader, Input, Divider, Select, Textarea, ConfirmationModal, SearchableSelect, TemplateFormModal } from '../components/ui'
 import ProductsTable from '../components/table/ProductsTable'
 import { formatARS } from '../utils/currencyFormatters'
-import { MOCK_PLANTILLAS } from '../data'
 import useDataStore from '../stores/dataStore'
 import { generateAndSavePresupuestoPDF } from '../utils/pdfGenerator'
 
@@ -18,7 +17,8 @@ import { generateAndSavePresupuestoPDF } from '../utils/pdfGenerator'
  * En prod: se reemplaza el estado inicial por invoke() correspondiente.
  */
 export default function Creador() {
-  const { productos, empleados } = useDataStore()
+  const { productos, empleados, presupuestos, reloadPresupuestos } = useDataStore()
+  const plantillasActivas = presupuestos.filter(p => p.es_plantilla === 1)
 
   // --- Estados controlados del formulario ---
   const [nombreCliente, setNombreCliente] = useState('')
@@ -122,29 +122,56 @@ export default function Creador() {
     setIsTemplateModalOpen(true)
   }
 
-  const handleSaveTemplateConfirm = (nombrePlantilla) => {
-    const nuevaPlantilla = {
-      id: `tmpl-${crypto.randomUUID()}`,
-      nombre: nombrePlantilla,
-      descripcion_general: descripcionGeneral,
-      mano_de_obra_centavos: manoDeObraCentavos, // Persistencia de la mano de obra en plantilla
-      items: productRows.filter(row => row.product_id !== '').map(row => ({
-        product_id: row.product_id,
-        quantity: row.quantity,
-        unit_price_centavos: row.unit_price_centavos
-      }))
-    }
-    MOCK_PLANTILLAS.push(nuevaPlantilla)
-    setSelectedTemplate(nuevaPlantilla.id)
-    setIsTemplateModalOpen(false)
+  const handleSaveTemplateConfirm = async (nombrePlantilla) => {
+    try {
+      const { invoke } = await import('@tauri-apps/api/core')
+      const nuevaPlantilla = {
+        id: 0,
+        es_plantilla: 1,
+        nombre_plantilla: nombrePlantilla,
+        fecha_emision: new Date().toISOString().split('T')[0],
+        cliente_nombre: '',
+        cliente_telefono: '',
+        cliente_email: '',
+        cliente_localidad: '',
+        descripcion_general: descripcionGeneral,
+        mano_de_obra_centavos: manoDeObraCentavos,
+        total_centavos: manoDeObraCentavos + subtotalCentavos,
+        vendedor_id: 0,
+        vendedor_nombre: '',
+        observaciones: '',
+        estado: 'plantilla',
+        items: productRows.filter(row => row.product_id !== '').map(row => ({
+          producto_id: row.product_id.toString(),
+          descripcion: '',
+          cantidad: row.quantity,
+          precio_unitario_centavos: row.unit_price_centavos
+        }))
+      }
 
-    showConfirm({
-      title: 'Plantilla Guardada',
-      message: `La plantilla "${nombrePlantilla}" ha sido creada exitosamente con los ítems y descripción del formulario actual.`,
-      variant: 'success',
-      confirmText: 'Aceptar',
-      onConfirm: () => {}
-    })
+      const id = await invoke('save_presupuesto', { presupuesto: nuevaPlantilla })
+      await reloadPresupuestos()
+      
+      setSelectedTemplate(id.toString())
+      setIsTemplateModalOpen(false)
+
+      showConfirm({
+        title: 'Plantilla Guardada',
+        message: `La plantilla "${nombrePlantilla}" ha sido creada exitosamente.`,
+        variant: 'success',
+        confirmText: 'Aceptar',
+        onConfirm: () => {}
+      })
+    } catch (e) {
+      console.error(e)
+      showConfirm({
+        title: 'Error',
+        message: `Hubo un error al guardar: ${e}`,
+        variant: 'danger',
+        confirmText: 'Aceptar',
+        onConfirm: () => {}
+      })
+    }
   }
 
   const handleSaveDraft = () => {
@@ -264,7 +291,7 @@ export default function Creador() {
   ])
 
   // Manejador de cambio de plantilla: autopopula la grilla interactiva y el textarea en caliente
-  const handleTemplateChange = (e) => {
+  const handleTemplateChange = async (e) => {
     const templateId = e.target.value
     setSelectedTemplate(templateId)
 
@@ -279,8 +306,8 @@ export default function Creador() {
       return
     }
 
-    // Buscar plantilla en los mocks locales
-    const template = MOCK_PLANTILLAS.find(t => t.id === templateId)
+    // Buscar plantilla real
+    const template = plantillasActivas.find(t => t.id.toString() === templateId)
     if (template) {
       // Cargar descripción general correspondiente
       setDescripcionGeneral(template.descripcion_general || '')
@@ -295,108 +322,35 @@ export default function Creador() {
         setManoDeObraPesosText('')
       }
 
-      if (template.items) {
-        // Inyectar en bloque los ítems de la plantilla — Safe Money (centavos enteros)
-        setProductRows(template.items.map(item => ({
-          id: crypto.randomUUID(),
-          product_id: item.product_id,
-          quantity: item.quantity,
-          unit_price_centavos: item.unit_price_centavos
-        })))
+      try {
+        const { invoke } = await import('@tauri-apps/api/core')
+        const detalles = await invoke('get_presupuesto_detalles', { id: template.id })
+        
+        if (detalles && detalles.length > 0) {
+          // Inyectar en bloque los ítems de la plantilla — Safe Money (centavos enteros)
+          setProductRows(detalles.map(item => ({
+            id: crypto.randomUUID(),
+            product_id: parseInt(item.producto_id, 10) || item.producto_id,
+            quantity: item.cantidad,
+            unit_price_centavos: item.precio_unitario_centavos
+          })))
+        } else {
+          setProductRows([{ id: crypto.randomUUID(), product_id: '', quantity: 1, unit_price_centavos: 0 }])
+        }
+      } catch (e) {
+        console.error("Error obteniendo detalles de plantilla", e)
       }
     }
   }
 
-  // Actualizar plantilla en caliente localmente con comparador quirúrgico
+  // Actualizar plantilla en caliente localmente
   const handleUpdateTemplate = () => {
-    if (!selectedTemplate) return
-    const index = MOCK_PLANTILLAS.findIndex(t => t.id === selectedTemplate)
-    if (index === -1) return
-
-    const plantillaPrevia = MOCK_PLANTILLAS[index]
-    const prevItems = plantillaPrevia.items || []
-    const currentItems = productRows.filter(row => row.product_id !== '')
-
-    const cambiosDetectados = []
-
-    // 1. Detectar materiales eliminados o con cantidad modificada
-    prevItems.forEach(prev => {
-      const curr = currentItems.find(c => c.product_id === prev.product_id)
-      const producto = productos.find(p => p.id === prev.product_id)
-      const nombreProd = producto ? producto.nombre : prev.product_id
-
-      if (!curr) {
-        cambiosDetectados.push(`Se quitó el material/servicio: "${nombreProd}"`)
-      } else if (curr.quantity !== prev.quantity) {
-        cambiosDetectados.push(`Se modificó la cantidad de "${nombreProd}": ${prev.quantity} -> ${curr.quantity}`)
-      }
-    })
-
-    // 2. Detectar materiales agregados nuevos
-    currentItems.forEach(curr => {
-      const prev = prevItems.find(p => p.product_id === curr.product_id)
-      const producto = productos.find(p => p.id === curr.product_id)
-      const nombreProd = producto ? producto.nombre : curr.product_id
-
-      if (!prev) {
-        cambiosDetectados.push(`Se agregó el material/servicio: "${nombreProd}" (Cantidad: ${curr.quantity})`)
-      }
-    })
-
-    // 3. Detectar cambios en la descripción general
-    const prevDesc = plantillaPrevia.descripcion_general || ''
-    const currentDesc = descripcionGeneral || ''
-    if (prevDesc.trim() !== currentDesc.trim()) {
-      if (!prevDesc.trim() && currentDesc.trim()) {
-        cambiosDetectados.push('Se agregó la descripción general a la plantilla')
-      } else if (prevDesc.trim() && !currentDesc.trim()) {
-        cambiosDetectados.push('Se quitó la descripción general de la plantilla')
-      } else {
-        cambiosDetectados.push('Se modificó el texto de la descripción general')
-      }
-    }
-
-    // 4. Detectar cambios en la mano de obra
-    const prevManoObra = plantillaPrevia.mano_de_obra_centavos || 0
-    if (prevManoObra !== manoDeObraCentavos) {
-      if (prevManoObra === 0 && manoDeObraCentavos > 0) {
-        cambiosDetectados.push(`Se agregó el costo de Mano de Obra: ${formatARS(manoDeObraCentavos)}`)
-      } else if (prevManoObra > 0 && manoDeObraCentavos === 0) {
-        cambiosDetectados.push(`Se eliminó el costo de Mano de Obra: ${formatARS(prevManoObra)}`)
-      } else {
-        cambiosDetectados.push(`Se modificó el costo de Mano de Obra: ${formatARS(prevManoObra)} -> ${formatARS(manoDeObraCentavos)}`)
-      }
-    }
-
-    // Contenido del cuerpo del modal
-    const bodyContent = cambiosDetectados.length === 0 ? (
-      <span>No se registraron cambios entre el formulario actual y el modelo original de la plantilla.</span>
-    ) : (
-      <div className="flex flex-col gap-2">
-        <span className="font-semibold text-on-surface">Se registraron las siguientes modificaciones con respecto a la plantilla original:</span>
-        <ul className="list-disc pl-5 text-xs text-on-surface-variant flex flex-col gap-1">
-          {cambiosDetectados.map((c, i) => (
-            <li key={i}>{c}</li>
-          ))}
-        </ul>
-        <span className="mt-2 text-xs font-semibold text-tertiary">¿Deseas sobreescribir la plantilla con estos cambios de taller?</span>
-      </div>
-    )
-
     showConfirm({
       title: 'Actualizar Plantilla',
-      message: bodyContent,
-      variant: 'warning',
-      confirmText: 'Actualizar',
-      onConfirm: () => {
-        MOCK_PLANTILLAS[index].items = currentItems.map(row => ({
-          product_id: row.product_id,
-          quantity: row.quantity,
-          unit_price_centavos: row.unit_price_centavos
-        }))
-        MOCK_PLANTILLAS[index].descripcion_general = descripcionGeneral
-        MOCK_PLANTILLAS[index].mano_de_obra_centavos = manoDeObraCentavos // Guardar mano de obra actualizada
-      }
+      message: 'La actualización de plantillas existentes aún no está implementada en el backend. Puedes guardarla como una plantilla nueva desde el botón "Guardar Plantilla".',
+      variant: 'info',
+      confirmText: 'Entendido',
+      onConfirm: () => {}
     })
   }
 
@@ -446,7 +400,7 @@ export default function Creador() {
               onChange={handleTemplateChange}
               options={[
                 { value: '', label: 'Sin plantilla' },
-                ...MOCK_PLANTILLAS.map(t => ({ value: t.id, label: t.nombre }))
+                ...plantillasActivas.map(t => ({ value: t.id.toString(), label: t.nombre_plantilla }))
               ]}
             />
             <Button

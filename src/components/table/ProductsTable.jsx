@@ -3,9 +3,8 @@ import DataTable from './DataTable'
 import TableActionButton from './TableActionButton'
 import { formatARS } from '../../utils/currencyFormatters'
 import { SearchableSelect, QuantityInput } from '../ui'
-import { MOCK_CATALOGO } from '../../data/catalogo'
 
-export default function ProductsTable({ rows, onProductChange, onQuantityChange, onDeleteRow }) {
+export default function ProductsTable({ rows, catalogo = [], onProductChange, onQuantityChange, onDeleteRow }) {
   // Columnas para DataTable
   const columns = [
     { key: 'producto', label: 'PRODUCTO/SERVICIO' },
@@ -16,9 +15,9 @@ export default function ProductsTable({ rows, onProductChange, onQuantityChange,
   ]
 
   // Opciones del catálogo para el selector interactivo
-  const productOptions = MOCK_CATALOGO.map(p => ({
+  const productOptions = catalogo.map(p => ({
     value: p.id,
-    label: p.nombre,
+    label: p.nombre || p.material, // Soporta productos_base o insumos_base
   }))
 
   // Preparar filas para DataTable

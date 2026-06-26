@@ -33,6 +33,21 @@ fn get_configuracion(state: State<'_, AppState>) -> Result<ConfiguracionGeneral,
 }
 
 #[tauri::command]
+fn delete_presupuesto(id: i32, state: State<'_, AppState>) -> Result<(), String> {
+    let conn = state.conn.lock().unwrap();
+    // Use transaction for cascading delete just in case, though PRAGMA foreign_keys = ON should handle it.
+    conn.execute("DELETE FROM presupuestos WHERE id = ?1", [id]).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+fn rename_plantilla(id: i32, new_name: String, state: State<'_, AppState>) -> Result<(), String> {
+    let conn = state.conn.lock().unwrap();
+    conn.execute("UPDATE presupuestos SET nombre_plantilla = ?1 WHERE id = ?2", [new_name.clone(), id.to_string()]).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
 fn save_empleado(empleado: Empleado, state: State<'_, AppState>) -> Result<i32, String> {
     let conn = state.conn.lock().unwrap();
     if empleado.id <= 0 {
@@ -137,6 +152,26 @@ fn get_presupuestos(state: State<'_, AppState>) -> Result<Vec<Presupuesto>, Stri
     .collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())?;
     
     Ok(presupuestos)
+}
+
+#[tauri::command]
+fn get_presupuesto_detalles(id: i32, state: State<'_, AppState>) -> Result<Vec<PresupuestoDetalle>, String> {
+    let conn = state.conn.lock().unwrap();
+    let mut stmt = conn.prepare("SELECT id, presupuesto_id, producto_id, descripcion, cantidad, precio_unitario_centavos FROM presupuesto_detalles WHERE presupuesto_id = ?1").map_err(|e| e.to_string())?;
+    
+    let detalles = stmt.query_map([id], |row| {
+        Ok(PresupuestoDetalle {
+            id: row.get(0)?,
+            presupuesto_id: row.get(1)?,
+            producto_id: row.get(2)?,
+            descripcion: row.get(3)?,
+            cantidad: row.get(4)?,
+            precio_unitario_centavos: row.get(5)?,
+        })
+    }).map_err(|e| e.to_string())?
+    .collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())?;
+    
+    Ok(detalles)
 }
 
 #[tauri::command]
@@ -247,7 +282,10 @@ pub fn run() {
             get_insumos,
             get_productos,
             get_presupuestos,
+            get_presupuesto_detalles,
             save_presupuesto,
+            delete_presupuesto,
+            rename_plantilla,
             save_empleado,
             toggle_empleado_activo,
             export_db,

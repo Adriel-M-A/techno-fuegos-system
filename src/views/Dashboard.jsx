@@ -80,43 +80,63 @@ export default function Dashboard() {
       variant: 'info',
       confirmText: 'Exportar PDF',
       onConfirm: async () => {
-        // En prod real se debería hacer un invoke('get_presupuesto', { id })
-        // Por ahora construimos un objeto compatible con lo que tenemos
-        const presupuestoData = {
-          nombreCliente: p.cliente_nombre,
-          fecha_emision: p.fecha_emision,
-          descripcionGeneral: `Presupuesto N° ${p.id} - ${p.estado.toUpperCase()}`,
-          productRows: [
-            {
-              product_id: 'generico', // Si no tenemos ID real
-              quantity: 1,
-              unit_price_centavos: p.total_centavos
-            }
-          ],
-          subtotalCentavos: p.total_centavos,
-          manoDeObraCentavos: 0,
-          totalCentavos: p.total_centavos,
-          observaciones: `Vendedor: ${p.vendedor_nombre}`
-        }
+        try {
+          const { invoke } = await import('@tauri-apps/api/core')
+          
+          // Obtener los detalles reales de la base de datos
+          const detalles = await invoke('get_presupuesto_detalles', { id: p.id })
+          
+          const productRows = detalles.map(d => ({
+            product_id: d.producto_id,
+            quantity: d.cantidad,
+            unit_price_centavos: d.precio_unitario_centavos
+          }))
 
-        // Para evitar fallos en el find() del catálogo, pasamos un catálogo con el ítem genérico
-        const catalogMock = [{ id: 'generico', nombre: 'Presupuesto Completo (Resumen)' }]
-        
-        const { generateAndSavePresupuestoPDF } = await import('../utils/pdfGenerator')
-        const result = await generateAndSavePresupuestoPDF(presupuestoData, catalogMock)
-        
-        if (result.success) {
-          showConfirm({
-            title: 'Exportación Exitosa',
-            message: `El PDF se guardó correctamente.`,
-            variant: 'success',
-            confirmText: 'Aceptar',
-            onConfirm: () => {}
-          })
-        } else if (!result.cancelled) {
+          const presupuestoData = {
+            nombreCliente: p.cliente_nombre,
+            fecha_emision: p.fecha_emision,
+            telefonoCliente: p.cliente_telefono,
+            localidadCliente: p.cliente_localidad,
+            emailCliente: p.cliente_email,
+            descripcionGeneral: p.descripcion_general || `Presupuesto N° ${p.id} - ${p.estado.toUpperCase()}`,
+            productRows,
+            subtotalCentavos: p.total_centavos - p.mano_de_obra_centavos,
+            manoDeObraCentavos: p.mano_de_obra_centavos,
+            totalCentavos: p.total_centavos,
+            observaciones: p.observaciones || `Vendedor: ${p.vendedor_nombre}`
+          }
+
+          // Importamos utilidades
+          const { generateAndSavePresupuestoPDF } = await import('../utils/pdfGenerator')
+          const useDataStore = (await import('../stores/dataStore')).default
+          
+          // Usamos el catálogo real cargado en el store
+          const { productos, insumos } = useDataStore.getState()
+          const catalogoCompleto = [...productos, ...insumos]
+          
+          const result = await generateAndSavePresupuestoPDF(presupuestoData, catalogoCompleto)
+          
+          if (result.success) {
+            showConfirm({
+              title: 'Exportación Exitosa',
+              message: `El PDF se guardó correctamente.`,
+              variant: 'success',
+              confirmText: 'Aceptar',
+              onConfirm: () => {}
+            })
+          } else if (!result.cancelled) {
+            showConfirm({
+              title: 'Error de Exportación',
+              message: 'Ocurrió un error al intentar guardar el PDF.',
+              variant: 'danger',
+              confirmText: 'Aceptar',
+              onConfirm: () => {}
+            })
+          }
+        } catch (error) {
           showConfirm({
             title: 'Error de Exportación',
-            message: 'Ocurrió un error al intentar guardar el PDF.',
+            message: `Ocurrió un error al cargar los datos: ${error}`,
             variant: 'danger',
             confirmText: 'Aceptar',
             onConfirm: () => {}
