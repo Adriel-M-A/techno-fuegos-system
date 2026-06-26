@@ -16,6 +16,26 @@ export default function App() {
     loadInitialData()
   }, [loadInitialData])
 
+  // Lógica global para soportar F11 Fullscreen nativo
+  useEffect(() => {
+    const handleKeyDown = async (e) => {
+      if (e.key === 'F11') {
+        e.preventDefault()
+        try {
+          // Tauri v2 API
+          const { getCurrentWindow } = await import('@tauri-apps/api/window')
+          const win = getCurrentWindow()
+          const isFullscreen = await win.isFullscreen()
+          await win.setFullscreen(!isFullscreen)
+        } catch (error) {
+          console.error("Error toggling fullscreen", error)
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   if (!isInitialized) {
     return (
       <div className="flex h-screen w-screen bg-background items-center justify-center">

@@ -4,7 +4,7 @@ import SidebarButton from './SidebarButton'
 
 // Listado de ítems de navegación parametrizados de acuerdo con la guía de diseño
 const NAV_ITEMS = [
-  { label: 'Dashboard', icon: LayoutGrid, vista: 'presupuestos' },
+  { label: 'Inicio', icon: LayoutGrid, vista: 'presupuestos' },
   { label: 'Creador', icon: PlusCircle, vista: 'creador' },
   { label: 'Configuración', icon: Settings, vista: 'costos' },
   { label: 'Centro de Ayuda', icon: LifeBuoy, vista: 'manual' },

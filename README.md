@@ -9,18 +9,23 @@ El sistema opera completamente offline y tiene como objetivo principal digitaliz
 ## Características del Sistema (MVP)
 
 ### Panel de Presupuestos
+
 Pantalla de inicio con métricas rápidas de facturación mensual, cotizaciones pendientes y alertas de documentos vencidos. Incluye búsqueda en tiempo real por cliente, filtros por estado (Borrador, Enviado, Aceptado, Vencido) y acciones directas para visualizar, editar o re-exportar cada presupuesto.
 
 ### Creador de Presupuestos
+
 Núcleo operativo del sistema. Formulario paramétrico con carga de plantillas, datos del cliente, campo superior de **Descripción General** (para definir el propósito global del presupuesto), selección de productos base, modificadores a medida (kg de hierro extra, horas de soldadura, herrajes) y cálculo del precio final en tiempo real. Permite guardar borradores, congelar configuraciones como plantillas y exportar el presupuesto a PDF.
 
 ### Panel de Configuración y Producción
+
 Administración interna organizada en cuatro pestañas superiores: gestión de insumos y recetas de productos, datos de la empresa y parámetros del PDF (cláusulas legales, validez en días), CRUD de empleados con control de estado activo/inactivo, y **Soporte y Mantenimiento** (herramientas técnicas de seguridad de base de datos con exportación e importación de copias de seguridad bit a bit a través de Tauri IPC desde/hacia la ruta local `%APPDATA%`).
 
 ### Exportación a PDF
+
 Generación de presupuestos profesionales en una estética clásica y limpia en blanco y negro (monocromática) para optimizar la claridad en taller y economizar tinta. Contiene cabecera dinámica con datos de la empresa, bloque físico de la "Descripción General", una tabla estructurada con un desglose técnico estricto de materiales crudos y horas de mano de obra en taller, tipografía monoespaciada para precios y totales, y bloque legal condicional en el pie de página. Descarga nativa mediante diálogos del sistema.
 
 ### Manual de Ayuda
+
 Sección dedicada en la barra lateral con el icono Lucide `LifeBuoy` regido por Zustand. Ofrece un **Manual de Ayuda** offline embebido (renderizado mediante `react-markdown` desde un archivo Markdown local `src/manual/manual.md`) para guiar de forma rápida y sencilla al usuario administrativo en las tareas comerciales diarias sin requerir conexión a Internet.
 
 ---
@@ -102,9 +107,6 @@ techno-fuegos-system/
 ├── .env.example              # Plantilla de variables de entorno
 └── README.md                 # Este archivo
 ```
-
-> [!NOTE]
-> La documentación técnica formal del proyecto (como el PRD y la Guía de Diseño) se encuentra centralizada en la base de conocimiento externa de Obsidian. Archivos como `.agents/`, `AGENTS.md` y `skills-lock.json` están excluidos del control de versiones por seguridad de credenciales y personalización local de entornos.
 
 ---
 

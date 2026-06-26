@@ -17,7 +17,7 @@ import { generateAndSavePresupuestoPDF } from '../utils/pdfGenerator'
  * En prod: se reemplaza el estado inicial por invoke() correspondiente.
  */
 export default function Creador() {
-  const { productos, empleados, presupuestos, reloadPresupuestos } = useDataStore()
+  const { insumos, empleados, presupuestos, reloadPresupuestos } = useDataStore()
   const plantillasActivas = presupuestos.filter(p => p.es_plantilla === 1)
 
   // --- Estados controlados del formulario ---
@@ -83,11 +83,11 @@ export default function Creador() {
     ])
   }
 
-  // Al seleccionar un producto, asignar unit_price_centavos desde el catálogo
+  // Al seleccionar un material, asignar unit_price_centavos desde el catálogo
   const handleProductChange = (rowId, newProductId) => {
-    const producto = productos.find(p => p.id === newProductId)
-    // precio_centavos: INTEGER desde el mock/SQLite — SAFE MONEY
-    const precio = producto ? producto.precio_centavos : 0
+    const insumo = insumos.find(i => i.id === newProductId)
+    // costo_centavos: INTEGER desde SQLite — SAFE MONEY
+    const precio = insumo ? insumo.costo_centavos : 0
     setProductRows(prev => prev.map(row =>
       row.id === rowId ? { ...row, product_id: newProductId, unit_price_centavos: precio } : row
     ))
@@ -103,8 +103,8 @@ export default function Creador() {
 
   const handleDeleteProductRow = (rowId) => {
     showConfirm({
-      title: 'Eliminar producto',
-      message: '¿Estás seguro de que deseas quitar este producto o servicio del presupuesto actual?',
+      title: 'Eliminar material',
+      message: '¿Estás seguro de que deseas quitar este material del presupuesto actual?',
       variant: 'danger',
       confirmText: 'Eliminar',
       onConfirm: () => {
@@ -358,7 +358,7 @@ export default function Creador() {
   const handleResetForm = () => {
     showConfirm({
       title: 'Restablecer Formulario',
-      message: '¿Estás seguro de que deseas limpiar por completo este presupuesto? Se borrarán todos los datos del cliente, la descripción general, las filas de productos y la logística.',
+      message: '¿Estás seguro de que deseas limpiar por completo este presupuesto? Se borrarán todos los datos del cliente, la descripción general, las filas de materiales y la logística.',
       variant: 'warning',
       confirmText: 'Restablecer Todo',
       onConfirm: () => {
@@ -442,9 +442,9 @@ export default function Creador() {
           />
         </Card>
 
-        {/* Sección C — Selección de Productos y Servicios */}
+        {/* Sección C — Selección de Materiales */}
         <Card
-          title="Selección de Productos y Servicios"
+          title="Selección de Materiales"
           headerActions={
             <Button
               variant="secondary"
@@ -461,7 +461,7 @@ export default function Creador() {
           {/* Inyección de tabla de materiales (Patrón A) */}
           <ProductsTable
             rows={productRows}
-            catalogo={productos}
+            catalogo={insumos}
             onProductChange={handleProductChange}
             onQuantityChange={handleQuantityChange}
             onDeleteRow={handleDeleteProductRow}
@@ -513,17 +513,17 @@ export default function Creador() {
         <div className="flex items-center gap-6">
           <div className="flex flex-col items-start">
             <span className="label-md text-on-surface-variant uppercase">Subtotal Ítems</span>
-            <span className="mono-data text-on-surface font-bold">{formatARS(subtotalCentavos)}</span>
+            <span className="text-xl mono-data text-on-surface font-bold">{formatARS(subtotalCentavos)}</span>
           </div>
           <Divider orientation="vertical" className="h-10" />
           <div className="flex flex-col items-start">
             <span className="label-md text-on-surface-variant uppercase">Mano de Obra</span>
-            <span className="mono-data text-on-surface font-bold">{formatARS(manoDeObraCentavos)}</span>
+            <span className="text-xl mono-data text-on-surface font-bold">{formatARS(manoDeObraCentavos)}</span>
           </div>
           <Divider orientation="vertical" className="h-10" />
           <div className="flex flex-col items-start">
             <span className="label-md text-on-surface uppercase">Total</span>
-            <span className="text-lg font-bold mono-data text-primary leading-tight">{formatARS(totalCentavos)}</span>
+            <span className="text-3xl font-extrabold mono-data text-primary leading-tight">{formatARS(totalCentavos)}</span>
           </div>
         </div>
 

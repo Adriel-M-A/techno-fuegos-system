@@ -52,6 +52,7 @@ pub struct Presupuesto {
     pub vendedor_nombre: Option<String>,
     pub observaciones: Option<String>,
     pub estado: Option<String>,
+    pub items_count: Option<i32>,
     pub items: Option<Vec<PresupuestoDetalle>>,
 }
 

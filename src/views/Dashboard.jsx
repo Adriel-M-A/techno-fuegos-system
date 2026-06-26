@@ -326,7 +326,7 @@ export default function Dashboard() {
 
         {/* Filtro por Estado */}
         <div className="flex items-center gap-2">
-          <span className="label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider select-none">
+          <span className="label-lg text-xs font-bold text-on-surface-variant uppercase tracking-wider select-none whitespace-nowrap">
             Filtrar por:
           </span>
           <Select

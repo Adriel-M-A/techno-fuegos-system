@@ -7,7 +7,7 @@ import { SearchableSelect, QuantityInput } from '../ui'
 export default function ProductsTable({ rows, catalogo = [], onProductChange, onQuantityChange, onDeleteRow }) {
   // Columnas para DataTable
   const columns = [
-    { key: 'producto', label: 'PRODUCTO/SERVICIO' },
+    { key: 'producto', label: 'MATERIAL' },
     { key: 'cantidad', label: 'CANTIDAD', align: 'center' },
     { key: 'precio_unitario', label: 'PRECIO UNITARIO', align: 'right' },
     { key: 'subtotal', label: 'SUBTOTAL', align: 'right' },
@@ -28,7 +28,7 @@ export default function ProductsTable({ rows, catalogo = [], onProductChange, on
         options={productOptions}
         value={row.product_id}
         onChange={(e) => onProductChange(row.id, e.target.value)}
-        placeholder="Seleccionar producto..."
+        placeholder="Seleccionar material..."
       />
     ),
     cantidad: (
@@ -68,7 +68,7 @@ export default function ProductsTable({ rows, catalogo = [], onProductChange, on
     <DataTable
       columns={columns}
       rows={dataTableRows}
-      emptyMessage="No hay productos en la lista. Añadí una fila para comenzar."
+      emptyMessage="No hay materiales en la lista. Añadí una fila para comenzar."
     />
   )
 }

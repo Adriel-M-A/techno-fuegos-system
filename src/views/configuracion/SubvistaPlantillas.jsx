@@ -39,8 +39,9 @@ export default function SubvistaPlantillas() {
   ]
 
   // Función para calcular el costo total acumulado en centavos enteros (SAFE MONEY)
-  const calcularCostoTotalCentavos = (items = []) => {
-    return items.reduce((acc, it) => acc + (it.unit_price_centavos || 0) * (it.quantity || 0), 0)
+  const calcularCostoTotalCentavos = (items) => {
+    if (!items) return 0
+    return items.reduce((acc, it) => acc + (it.precio_unitario_centavos || it.unit_price_centavos || 0) * (it.cantidad || it.quantity || 0), 0)
   }
 
   // Abrir modal para editar nombre
@@ -99,10 +100,9 @@ export default function SubvistaPlantillas() {
   // Array paginado rebanado
   const plantillasPaginadas = plantillas.slice((validPage - 1) * ITEMS_PER_PAGE, validPage * ITEMS_PER_PAGE)
 
-  // Mapear filas legibles
   const dataTableRows = plantillasPaginadas.map((row) => {
-    const itemsCount = row.items ? row.items.length : 0
-    const costoTotalCentavos = calcularCostoTotalCentavos(row.items) + (row.mano_de_obra_centavos || 0)
+    const itemsCount = row.items_count !== null && row.items_count !== undefined ? row.items_count : '--'
+    const costoTotalCentavos = row.total_centavos || 0
 
     return {
       id: row.id,

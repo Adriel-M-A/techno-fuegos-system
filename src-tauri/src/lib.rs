@@ -127,7 +127,7 @@ fn get_productos(state: State<'_, AppState>) -> Result<Vec<Producto>, String> {
 #[tauri::command]
 fn get_presupuestos(state: State<'_, AppState>) -> Result<Vec<Presupuesto>, String> {
     let conn = state.conn.lock().unwrap();
-    let mut stmt = conn.prepare("SELECT id, es_plantilla, nombre_plantilla, fecha_emision, cliente_nombre, cliente_telefono, cliente_email, cliente_localidad, descripcion_general, mano_de_obra_centavos, total_centavos, vendedor_id, vendedor_nombre, observaciones, estado FROM presupuestos ORDER BY id DESC").map_err(|e| e.to_string())?;
+    let mut stmt = conn.prepare("SELECT p.id, p.es_plantilla, p.nombre_plantilla, p.fecha_emision, p.cliente_nombre, p.cliente_telefono, p.cliente_email, p.cliente_localidad, p.descripcion_general, p.mano_de_obra_centavos, p.total_centavos, p.vendedor_id, p.vendedor_nombre, p.observaciones, p.estado, (SELECT COUNT(*) FROM presupuesto_detalles d WHERE d.presupuesto_id = p.id) as items_count FROM presupuestos p ORDER BY p.id DESC").map_err(|e| e.to_string())?;
     
     let presupuestos = stmt.query_map([], |row| {
         Ok(Presupuesto {
@@ -146,6 +146,7 @@ fn get_presupuestos(state: State<'_, AppState>) -> Result<Vec<Presupuesto>, Stri
             vendedor_nombre: row.get(12)?,
             observaciones: row.get(13)?,
             estado: row.get(14)?,
+            items_count: row.get(15).unwrap_or(None),
             items: None, // No cargamos los items en la lista general para hacerla más ligera
         })
     }).map_err(|e| e.to_string())?
